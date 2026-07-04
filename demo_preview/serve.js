@@ -7,13 +7,13 @@
 //   MODEL_BACKEND=ollama  (default)  -> pipe straight to Ollama's native /api/*   (OLLAMA_URL)
 //   MODEL_BACKEND=openai             -> translate to the OpenAI-compatible /v1 API (OPENAI_BASE_URL)
 //                                       — this is how you run on NVIDIA NIM (a Gemma NIM microservice),
-//                                         vLLM, or Ollama's own /v1 endpoint.
+//                                         Nebius AI Studio (hosted), vLLM, or Ollama's own /v1 endpoint.
 //
 // Env:
 //   PORT             (default 8422)
 //   MODEL_BACKEND    ollama | openai        (default ollama)
 //   OLLAMA_URL       default http://127.0.0.1:11434
-//   OPENAI_BASE_URL  default http://127.0.0.1:8000/v1   (e.g. a local NVIDIA NIM)
+//   OPENAI_BASE_URL  default http://127.0.0.1:8000/v1   (local NVIDIA NIM; or https://api.studio.nebius.com/v1)
 //   OPENAI_API_KEY   optional Bearer token (e.g. NGC key / build.nvidia.com)
 //   MODEL_ID         optional fallback model id for the openai backend
 //

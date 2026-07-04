@@ -9,6 +9,8 @@ Partner products used:
   storage) on the same cluster.
 - **NVIDIA** — swap the model backend to a **Gemma NIM** microservice (OpenAI-compatible), optionally on
   an **NVIDIA GPU** node via the **GPU Operator** (both bundled in **SUSE AI**).
+- **Nebius** — **Nebius AI Studio** (hosted, OpenAI-compatible) as a cloud / no-GPU inference tier — the
+  same backend switch, zero code change.
 
 The web app (`serve.js`) is **backend-agnostic**: the browser always speaks the same API, and the proxy
 translates to Ollama *or* any OpenAI-compatible endpoint (NIM). Flip backends with two env vars — no
@@ -59,6 +61,30 @@ kubectl apply -f deploy/k8s/nim/nim.yaml
 kubectl apply -f deploy/k8s/30-webapp.yaml
 kubectl -n resilience-compass rollout restart deploy/webapp
 ```
+
+## 3b. Optional: Nebius AI Studio (cloud tier — no local GPU)
+
+Nebius AI Studio is a hosted, **OpenAI-compatible** inference API, so `serve.js` uses it unchanged. Good
+as a **no-GPU demo path** or a cloud **"burst" tier**. Keep local Ollama as the private, offline default —
+don't route sensitive incident/BCM text to the cloud if you're claiming on-device/privacy-first.
+
+**Run the demo directly against Nebius (lowest effort):**
+```bash
+MODEL_BACKEND=openai \
+OPENAI_BASE_URL=https://api.studio.nebius.com/v1 \
+OPENAI_API_KEY=<your-nebius-key> \
+MODEL_ID=google/gemma-2-9b-it \
+node demo_preview/serve.js          # → http://localhost:8422, now served by Nebius
+```
+
+**On the cluster:**
+```bash
+# put your key in deploy/k8s/nebius/nebius.yaml, then:
+kubectl apply -f deploy/k8s/nebius/nebius.yaml                       # Secret + Nebius ConfigMap
+kubectl -n resilience-compass set env deployment/webapp --from=secret/model-api
+kubectl -n resilience-compass rollout restart deploy/webapp
+```
+Verify a **Gemma** variant is in the Nebius catalog and confirm the exact base URL / model id.
 
 ## 4. Optional: harden with SUSE NeuVector
 ```bash

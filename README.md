@@ -161,8 +161,9 @@ Gemma runs locally. This is the core proof for the on‑device track.
 Gemma inference microservice) by setting two env vars (verified locally against an OpenAI `/v1`
 endpoint). `deploy/` ships a **Dockerfile** + **K3s manifests** to run the whole stack on **SUSE K3s**
 (edge Kubernetes, Traefik ingress, `local‑path` storage), with an optional **NVIDIA NIM** GPU variant and
-a note for **SUSE NeuVector** zero‑trust security. Inference stays on the cluster — still offline /
-on‑device. See **[deploy/README.md](deploy/README.md)**.
+a note for **SUSE NeuVector** zero‑trust security, and can point at **Nebius AI Studio** (hosted Gemma)
+as a cloud / no‑GPU tier. Sensitive inference stays on the cluster — still offline / on‑device. See
+**[deploy/README.md](deploy/README.md)**.
 
 ## The Flutter mobile app
 

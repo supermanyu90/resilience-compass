@@ -1,0 +1,32 @@
+# ---------------------------------------------------------------------------
+# Nebius AI Studio backend — hosted, OpenAI-compatible inference.
+# serve.js needs NO code change; it already speaks the OpenAI API.
+#
+# Use as a CLOUD / no-local-GPU tier. Keep local Ollama as the private, offline
+# default — do not route sensitive incident/BCM text to the cloud for the
+# "on-device / privacy-first" claim.
+#
+# Apply, then inject the key + restart:
+#   kubectl apply -f deploy/k8s/nebius/nebius.yaml
+#   kubectl -n resilience-compass set env deployment/webapp --from=secret/model-api
+#   kubectl -n resilience-compass rollout restart deploy/webapp
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: Secret
+metadata:
+  name: model-api
+  namespace: resilience-compass
+type: Opaque
+stringData:
+  OPENAI_API_KEY: "REPLACE_WITH_YOUR_NEBIUS_API_KEY"
+---
+# Overrides the default resilience-config to target Nebius AI Studio.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resilience-config
+  namespace: resilience-compass
+data:
+  MODEL_BACKEND: "openai"
+  OPENAI_BASE_URL: "https://api.studio.nebius.com/v1"   # verify the current base URL
+  MODEL_ID: "google/gemma-2-9b-it"                       # pick a Gemma variant from the Nebius catalog
