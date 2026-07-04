@@ -191,9 +191,12 @@ function concentrationRisks(){const by={};
 
 // ================= Gemma via local Ollama =================
 function gemmaVer(n){const m=n.match(/gemma\s*([0-9]+)/i);return m?parseInt(m[1],10):0;}
+const PREFERRED_MODEL='gemma3:4b'; // snappy for the live demo; falls back to newest Gemma if absent
 async function detectModel(){
   const r=await fetch('/api/tags',{cache:'no-store'}); if(!r.ok)throw new Error('Ollama not reachable (HTTP '+r.status+')');
   const names=((await r.json()).models||[]).map(m=>m.name);
+  const exact=names.find(n=>n===PREFERRED_MODEL||n===PREFERRED_MODEL+':latest');
+  if(exact)return exact;
   const g=names.filter(n=>/gemma/i.test(n)).sort((a,b)=>gemmaVer(b)-gemmaVer(a));
   const tag=g[0]||names[0]; if(!tag)throw new Error('No model in Ollama. Run:  ollama pull gemma3:4b'); return tag;
 }
