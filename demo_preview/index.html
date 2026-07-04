@@ -143,6 +143,23 @@
   .owlhelper .owl.compact{flex:1;min-width:0}
   .owlhelper .owlbubble{flex:1;max-width:none;font-size:12px;padding:8px 11px}
   .owlhelper .owlchar{width:44px;height:49px}
+  /* brand + gamification */
+  .brandbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px 8px;background:linear-gradient(180deg,#EAF1FB,#FFFFFF);border-bottom:1px solid var(--border)}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .logo-compass{flex:0 0 auto}
+  .needle{transform-box:fill-box;transform-origin:24px 24px;animation:needle 3.6s ease-in-out infinite}
+  @keyframes needle{0%,100%{transform:rotate(-11deg)}50%{transform:rotate(11deg)}}
+  .brandtext{line-height:1;min-width:0}
+  .wordmark{font-weight:800;font-size:19px;letter-spacing:.01em;background:linear-gradient(90deg,#1E6FD9 0%,#0FB5A6 100%);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+  .brandtag{font-size:9px;letter-spacing:.2em;color:var(--textSec);font-weight:700;margin-top:3px}
+  .xpchip{flex:0 0 auto;min-width:118px;text-align:right}
+  .xprow{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:12px;font-weight:800;color:#134a95}
+  .xpbar{height:5px;border-radius:999px;background:var(--surfaceAlt);overflow:hidden;margin:4px 0 2px}
+  .xpbar > i{display:block;height:100%;background:linear-gradient(90deg,#1E6FD9,#0FB5A6);width:0;transition:width .6s ease}
+  .xpnum{font-size:9.5px;color:var(--textSec);font-weight:600}
+  .xptoast{position:absolute;top:52px;right:16px;background:#134a95;color:#fff;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;box-shadow:0 6px 16px rgba(20,45,80,.28);z-index:40;pointer-events:none;animation:xprise 1.6s ease forwards}
+  .xptoast.big{background:linear-gradient(90deg,#1E6FD9,#0FB5A6);top:78px;font-size:12.5px}
+  @keyframes xprise{0%{opacity:0;transform:translateY(8px) scale(.9)}14%{opacity:1;transform:translateY(0) scale(1)}72%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
 </style>
 </head>
 <body>
@@ -221,6 +238,7 @@ const state = {
   incidentText:'', likelihood:2, control:2, scan:null, scanError:null, pack:null, packBusy:false,
   tolerances: LS.get('tol', SEED_TOL.map(x=>({...x}))), vendors: LS.get('ven', SEED_VEN.map(v=>({...v,nth:[...v.nth]}))),
   owlTip:{assistant:'',scanner:'',tools:'',busy:false},
+  xp: LS.get('xp',0),
   modal:null,
 };
 state.juris.add('iso22301');
@@ -397,6 +415,22 @@ function lastQuestion(){for(let i=sim.log.length-1;i>=0;i--){const m=sim.log[i];
 function owlLineForSim(){ if(sim.busy)return owlT().readingSituation; const q=lastQuestion(); return q||owlT().yourMove; }
 function gaugeCount(score){const col=bandColor(score);return `<div class="gauge" style="width:84px;height:84px;background:conic-gradient(${col} ${score*3.6}deg, var(--surfaceAlt) 0)"><div class="hole"></div><span style="color:${col};font-size:26px" data-countup="${score}">0</span></div>`;}
 
+// ---- Brand + gamification (Resilience Points) ----
+const RANKS=[{xp:0,name:'Trainee'},{xp:60,name:'Analyst'},{xp:150,name:'Specialist'},{xp:300,name:'Resilience Lead'},{xp:500,name:'Chief Resilience Officer'}];
+function rankFor(xp){let i=0;for(let k=0;k<RANKS.length;k++){if(xp>=RANKS[k].xp)i=k;}return i;}
+function xpProgress(xp){const i=rankFor(xp),cur=RANKS[i],next=RANKS[i+1];
+  return {level:i+1,name:cur.name,pct:next?Math.max(4,Math.round((xp-cur.xp)/(next.xp-cur.xp)*100)):100};}
+function awardXp(n){const before=rankFor(state.xp); state.xp+=n; LS.set('xp',state.xp);
+  const after=rankFor(state.xp); xpToast('+'+n+' XP'); if(after>before) setTimeout(()=>xpToast('⬆ '+RANKS[after].name+'!',true),380);}
+function xpToast(text,big){const d=document.querySelector('.device'); if(!d)return; const t=document.createElement('div'); t.className='xptoast'+(big?' big':''); t.textContent=text; d.appendChild(t); setTimeout(()=>t.remove(),1600);}
+function compassSvg(){return `<svg class="logo-compass" viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
+  <circle cx="24" cy="24" r="21" fill="#fff" stroke="#1E6FD9" stroke-width="2.5"/>
+  <circle cx="24" cy="24" r="21" fill="none" stroke="rgba(15,181,166,.28)" stroke-width="3"/>
+  <text x="24" y="10" text-anchor="middle" font-size="6.5" fill="#5E6C7B" font-weight="700">N</text>
+  <g class="needle"><path d="M24 8 L27.5 24 L24 25.5 L20.5 24 Z" fill="#E23D42"/><path d="M24 40 L20.5 24 L24 22.5 L27.5 24 Z" fill="#9AA9BA"/></g>
+  <circle cx="24" cy="24" r="2.4" fill="#17232F"/>
+</svg>`;}
+
 // ---- Dr. Owl as a live helper on the Advisor tabs (uses real Gemma) ----
 function defaultTip(tab){const o=owlT();return tab==='assistant'?o.tipAssistant:tab==='scanner'?o.tipScanner:o.tipTools;}
 function helperOwl(tab){
@@ -418,7 +452,7 @@ async function fetchOwlTip(tab){
   else {const r=concentrationRisks();
     prompt=r.length?('You are '+owlT().name+', a warm resilience coach. In 40 words or fewer, warn about this concentration risk and suggest one concrete mitigation: "'+r[0].display+'" is shared by '+r[0].vendors.join(', ')+'. Reply in '+lang+', first person, no preamble.')
       :('You are '+owlT().name+', a warm resilience coach. In 35 words or fewer, explain why mapping Nth-party (fourth-party) dependencies matters for operational resilience. Reply in '+lang+', first person, no preamble.');}
-  try{ state.owlTip[tab]=await ollamaChat([{role:'user',content:prompt}],{temperature:0.6,onToken:(t2,full)=>{const b=document.getElementById('owlbubble'); if(b)b.textContent=full;}});
+  try{ state.owlTip[tab]=await ollamaChat([{role:'user',content:prompt}],{temperature:0.6,onToken:(t2,full)=>{const b=document.getElementById('owlbubble'); if(b)b.textContent=full;}}); awardXp(5);
   }catch(e){ state.owlTip[tab]=owlT().error; }
   state.owlTip.busy=false; render();
 }
@@ -441,10 +475,10 @@ async function simTurn(userContent, display){
   }catch(e){ entry.text='⚠️ '+e.message; }
   entry.streaming=false; sim.busy=false; render(); simScroll();
 }
-function submitDecision(){const ta=document.getElementById('decision'); if(!ta)return; const t=ta.value.trim(); if(!t||sim.busy)return; ta.value=''; sim.turns++; simTurn(t,true);}
+function submitDecision(){const ta=document.getElementById('decision'); if(!ta)return; const t=ta.value.trim(); if(!t||sim.busy)return; ta.value=''; sim.turns++; awardXp(10); simTurn(t,true);}
 async function endSim(){
   if(sim.busy)return; sim.phase='report'; sim.report=''; sim.reportBusy=true; render();
-  try{ sim.report=await ollamaChat([...sim.convo,{role:'user',content:reportRequest()}],{temperature:0.4,onToken:(t,full)=>{const n=document.getElementById('reportbody'); if(n)n.innerHTML=fmtReport(full);}});
+  try{ sim.report=await ollamaChat([...sim.convo,{role:'user',content:reportRequest()}],{temperature:0.4,onToken:(t,full)=>{const n=document.getElementById('reportbody'); if(n)n.innerHTML=fmtReport(full);}}); awardXp(40);
   }catch(e){ sim.report='⚠️ '+e.message; }
   sim.reportBusy=false; render();
 }
@@ -457,7 +491,7 @@ async function seedFromImage(file){
     const raw=await ollamaChat([{role:'user',content:'This is a bank IT architecture or vendor diagram. Extract JSON only: {"vendors":[{"vendor":"name","service":"what it provides","nth":["cloud or sub-providers shown"]}]}. Include any shared cloud provider as an nth entry.',images:[b64]}],{json:true,temperature:0.2});
     const obj=firstJsonObject(raw); const parsed=obj?JSON.parse(obj):null;
     const vs=(parsed&&Array.isArray(parsed.vendors))?parsed.vendors.filter(v=>v&&v.vendor):[];
-    if(vs.length){ state.vendors=vs.map(v=>({vendor:(''+v.vendor).slice(0,40),service:(''+(v.service||'')).slice(0,60),nth:Array.isArray(v.nth)?v.nth.map(x=>(''+x).slice(0,40)):[]})); persist();
+    if(vs.length){ state.vendors=vs.map(v=>({vendor:(''+v.vendor).slice(0,40),service:(''+(v.service||'')).slice(0,60),nth:Array.isArray(v.nth)?v.nth.map(x=>(''+x).slice(0,40)):[]})); persist(); awardXp(20);
       const rk=concentrationRisks(); sim.seedMsg='Imported '+vs.length+' vendors'+(rk.length?' — concentration risk on '+rk[0].display+'.':'.'); }
     else sim.seedMsg='No vendors detected in the image — keeping the sample bank.';
   }catch(e){ sim.seedMsg='Could not read the image ('+e.message+').'; }
@@ -485,11 +519,20 @@ function header(){
     :st==='error'?`<span style="color:var(--danger);font-size:11px" title="${esc(state.modelError||'')}">offline</span>`
     :`<span class="sub" style="font-size:11px">connecting…</span>`;
   const langOpts=Object.entries(LANGS).map(([k,v])=>`<option value="${k}" ${state.lang===k?'selected':''}>${v}</option>`).join('');
-  return `<div class="appbar">
-    <div class="row"><b>Resilience Compass</b><span class="badge"><span class="dot"></span>${S().offline}</span></div>
-    <div class="icons">${status}<select id="langsel" style="width:auto;padding:5px 6px">${langOpts}</select>
-      <button class="iconbtn" data-act="toggleview" title="${state.view==='sim'?'Advisor tools':'Crisis simulator'}">${state.view==='sim'?'🧰':'🔴'}</button>
-      <button class="iconbtn" data-act="about">ⓘ</button></div></div>`;
+  const g=xpProgress(state.xp);
+  return `<div class="brandbar">
+      <div class="brand">${compassSvg()}<div class="brandtext"><div class="wordmark">Resilience Compass</div><div class="brandtag">OPERATIONAL RESILIENCE</div></div></div>
+      <div class="xpchip" title="${esc(g.name)} · ${state.xp} XP">
+        <div class="xprow"><span>⭐</span><span>${esc(g.name)}</span></div>
+        <div class="xpbar"><i style="width:${g.pct}%"></i></div>
+        <div class="xpnum">Lv ${g.level} · ${state.xp} XP</div>
+      </div>
+    </div>
+    <div class="appbar">
+      <div class="row"><span class="badge"><span class="dot"></span>${S().offline}</span>${status}</div>
+      <div class="icons"><select id="langsel" style="width:auto;padding:5px 6px">${langOpts}</select>
+        <button class="iconbtn" data-act="toggleview" title="${state.view==='sim'?'Advisor tools':'Crisis simulator'}">${state.view==='sim'?'🧰':'🔴'}</button>
+        <button class="iconbtn" data-act="about">ⓘ</button></div></div>`;
 }
 
 // ---- HERO ----
@@ -645,7 +688,7 @@ async function aTurn(userContent, display, expectScore){ const chatEmpty=false;
   const idx=state.messages.length-1; let raw='';
   try{ raw=await ollamaChat(state.convo,{temperature:expectScore?0.5:0.7,onToken:(t,full)=>{const n=document.querySelector('#amsg-'+idx+' .bubble-text'); if(n)n.textContent=displayText(full); aScroll();}});
     state.convo.push({role:'assistant',content:raw});
-    if(expectScore){const a=extractAssessment(raw); if(a&&a.maturity){msg.assessment=a; state.assessments[PILLARS[state.pillar].id]=a;}}
+    if(expectScore){const a=extractAssessment(raw); if(a&&a.maturity){msg.assessment=a; state.assessments[PILLARS[state.pillar].id]=a; awardXp(15);}}
     msg.text=displayText(raw)||raw.trim();
   }catch(e){ msg.text='⚠️ '+e.message; }
   msg.streaming=false; state.busy=false; render(); aScroll();
@@ -656,7 +699,7 @@ async function analyze(){ const ta=document.getElementById('inc'); state.inciden
   if(!state.incidentText.trim()||state.busy)return; state.busy=true; state.scan=null; state.scanError=null; render();
   try{ const raw=await ollamaChat([{role:'system',content:incidentSystemPrompt()},{role:'user',content:state.incidentText}],{json:true,temperature:0.2});
     const cls=extractIncident(raw); if(!cls)throw new Error('Could not parse the classification.');
-    state.scan={cls,score:computeScore(cls.severity,state.likelihood,state.control)};
+    state.scan={cls,score:computeScore(cls.severity,state.likelihood,state.control)}; awardXp(15);
   }catch(e){ state.scanError=e.message; } state.busy=false; render();
 }
 
