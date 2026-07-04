@@ -6,18 +6,19 @@
 <title>Resilience Compass — On-device Gemma (Ollama)</title>
 <style>
   :root{
-    --bg:#0B1220; --surface:#141C2B; --surfaceAlt:#1C2740; --border:#243048;
-    --primary:#3DD6C4; --accent:#6C8CFF; --text:#E6ECF5; --textSec:#95A3B8;
-    --good:#4ADE80; --warn:#F5B841; --danger:#FF6B6B;
+    --bg:#F5F8FC; --surface:#FFFFFF; --surfaceAlt:#EDF2F8; --border:#DBE3EE;
+    --primary:#1E6FD9; --accent:#0FB5A6; --text:#17232F; --textSec:#5E6C7B;
+    --good:#16A34A; --warn:#E0900C; --danger:#E23D42;
+    --shadow:0 1px 3px rgba(20,45,80,.07),0 1px 2px rgba(20,45,80,.05);
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:#05070d;color:var(--text);
+  html,body{margin:0;background:#E3E9F2;color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
   .page{min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 12px;}
   .banner{max-width:440px;width:100%;font-size:12px;color:var(--textSec);text-align:center;line-height:1.5}
-  .banner b{color:var(--good)}
+  .banner b{color:#0E7C4A}
   .device{width:440px;max-width:100%;height:840px;background:var(--bg);border:1px solid var(--border);
-    border-radius:28px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);position:relative}
+    border-radius:28px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(30,55,90,.16);position:relative}
   #app{flex:1;min-height:0;display:flex;flex-direction:column}
   .body2{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
   .pad{padding:20px}
@@ -27,67 +28,67 @@
   .row{display:flex;align-items:center;gap:8px}
   .between{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;
-    background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.4);color:var(--good);font-size:11px;font-weight:600}
+    background:rgba(22,163,74,.10);border:1px solid rgba(22,163,74,.35);color:#0E7C4A;font-size:11px;font-weight:600}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--good)}
   .label{font-size:14px;font-weight:600;margin:0 0 8px}
   .hint{font-size:12px;color:var(--textSec);margin:0 0 8px}
   .chip{padding:8px 12px;border-radius:999px;background:var(--surfaceAlt);border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;user-select:none}
-  .chip.sel{background:rgba(61,214,196,.18);border-color:var(--primary)}
+  .chip.sel{background:rgba(30,111,217,.12);border-color:var(--primary);color:#134a95}
   .wrap{display:flex;flex-wrap:wrap;gap:8px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:8px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:8px;box-shadow:var(--shadow)}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:14px;
-    background:var(--primary);color:#04231F;font-weight:700;border:none;cursor:pointer;font-size:15px;width:100%}
-  .btn:disabled{opacity:.5;cursor:default}
-  .btn.danger{background:var(--danger);color:#2A0A0A}
-  .btn.tonal{background:rgba(61,214,196,.16);color:var(--primary);width:auto}
+    background:var(--primary);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:15px;width:100%;box-shadow:0 2px 8px rgba(30,111,217,.28)}
+  .btn:disabled{opacity:.5;cursor:default;box-shadow:none}
+  .btn.danger{background:var(--danger);color:#fff;box-shadow:0 2px 8px rgba(226,61,66,.28)}
+  .btn.tonal{background:rgba(30,111,217,.12);color:var(--primary);width:auto;box-shadow:none}
   .btn.ghost{background:transparent;color:var(--textSec);width:auto}
   .btn.sm{padding:8px 12px;font-size:13px;width:auto}
-  input,textarea,select{width:100%;background:var(--surfaceAlt);border:1px solid var(--border);color:var(--text);
+  input,textarea,select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);
     border-radius:12px;padding:11px 12px;font-size:14px;font-family:inherit;outline:none}
-  input:focus,textarea:focus{border-color:var(--primary)}
+  input:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(30,111,217,.12)}
   textarea{resize:vertical}
   .pill{padding:3px 8px;border-radius:8px;font-size:10px;background:var(--surfaceAlt);color:var(--textSec)}
-  .appbar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+  .appbar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--surface)}
   .appbar .icons{display:flex;gap:8px;align-items:center}
   .iconbtn{background:transparent;border:none;color:var(--text);cursor:pointer;font-size:17px;padding:5px;border-radius:8px}
-  .modeltag{font-size:10px;color:var(--primary);background:rgba(61,214,196,.12);border:1px solid rgba(61,214,196,.3);padding:2px 6px;border-radius:6px}
+  .modeltag{font-size:10px;color:var(--primary);background:rgba(30,111,217,.10);border:1px solid rgba(30,111,217,.28);padding:2px 6px;border-radius:6px}
   /* hero */
-  .hero{background:radial-gradient(120% 120% at 0% 0%, #17202f 0%, #0B1220 60%);border:1px solid var(--border);border-radius:20px;padding:22px}
+  .hero{background:linear-gradient(165deg,#E9F1FC 0%,#FFFFFF 58%);border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:var(--shadow)}
   .herobadge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.09em;color:var(--danger);
-    background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.4);padding:4px 10px;border-radius:999px}
-  .concchip{display:inline-flex;align-items:center;gap:6px;background:rgba(245,184,65,.12);border:1px solid rgba(245,184,65,.45);
-    color:var(--warn);font-size:12px;font-weight:600;padding:6px 10px;border-radius:10px;margin-top:4px}
+    background:rgba(226,61,66,.10);border:1px solid rgba(226,61,66,.35);padding:4px 10px;border-radius:999px}
+  .concchip{display:inline-flex;align-items:center;gap:6px;background:rgba(224,144,12,.12);border:1px solid rgba(224,144,12,.42);
+    color:#9a6206;font-size:12px;font-weight:600;padding:6px 10px;border-radius:10px;margin-top:4px}
   .steps{display:flex;gap:6px;margin:14px 0}
   .steps > div{flex:1;height:4px;border-radius:2px;background:var(--surfaceAlt)}
   .steps > div.on{background:var(--primary)}
   .upload{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
-  .filebtn{display:inline-block;font-size:12px;color:var(--accent);cursor:pointer;text-decoration:underline}
+  .filebtn{display:inline-block;font-size:12px;color:var(--primary);cursor:pointer;text-decoration:underline}
   /* sim log */
   .simlog{display:flex;flex-direction:column;gap:10px;padding:0 16px 8px}
-  .fac{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:12px;padding:12px 14px;line-height:1.5;white-space:pre-wrap;font-size:14px}
-  .dec{align-self:flex-end;background:rgba(61,214,196,.14);border:1px solid rgba(61,214,196,.4);border-radius:12px;padding:10px 12px;max-width:88%;white-space:pre-wrap}
+  .fac{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:12px;padding:12px 14px;line-height:1.5;white-space:pre-wrap;font-size:14px;box-shadow:var(--shadow)}
+  .dec{align-self:flex-end;background:rgba(30,111,217,.10);border:1px solid rgba(30,111,217,.32);border-radius:12px;padding:10px 12px;max-width:88%;white-space:pre-wrap}
   .faclabel{color:var(--primary);font-weight:800}
-  .injectlabel{color:var(--warn);font-weight:800}
+  .injectlabel{color:#b5710a;font-weight:800}
   .cursor{display:inline-block;width:7px;height:1em;background:var(--danger);vertical-align:text-bottom;animation:blink 1s steps(1) infinite}
   @keyframes blink{50%{opacity:0}}
   /* report */
-  .report{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;line-height:1.55;font-size:14px}
+  .report{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;line-height:1.55;font-size:14px;box-shadow:var(--shadow)}
   .report h3{color:var(--primary);font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 4px}
   .report h3:first-child{margin-top:0}
   /* advisor */
-  .subtabs{display:flex;border-bottom:1px solid var(--border)}
+  .subtabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface)}
   .stab{flex:1;text-align:center;padding:11px 4px;color:var(--textSec);cursor:pointer;font-size:12px}
   .stab.sel{color:var(--primary);border-bottom:2px solid var(--primary)}
   .bubble{max-width:88%;padding:12px 14px;border-radius:16px;margin:6px 0;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
-  .bubble.a{background:var(--surface);border:1px solid var(--border);align-self:flex-start}
-  .bubble.u{background:rgba(61,214,196,.14);border:1px solid rgba(61,214,196,.4);align-self:flex-end}
+  .bubble.a{background:var(--surface);border:1px solid var(--border);align-self:flex-start;box-shadow:var(--shadow)}
+  .bubble.u{background:rgba(30,111,217,.10);border:1px solid rgba(30,111,217,.32);align-self:flex-end}
   .chatcol{display:flex;flex-direction:column;padding:0 16px}
   .mbadge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-top:10px}
-  .cite{display:inline-block;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;margin:6px 6px 0 0;background:rgba(108,140,255,.12);border:1px solid rgba(108,140,255,.35);color:var(--accent)}
-  .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .cite{display:inline-block;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;margin:6px 6px 0 0;background:rgba(15,181,166,.14);border:1px solid rgba(15,181,166,.4);color:#0A7F73}
+  .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface)}
   .seg > div{flex:1;text-align:center;padding:9px 4px;cursor:pointer;font-size:13px;color:var(--text);border-right:1px solid var(--border)}
   .seg > div:last-child{border-right:none}
-  .seg > div.sel{background:rgba(61,214,196,.18);color:var(--primary);font-weight:600}
+  .seg > div.sel{background:rgba(30,111,217,.12);color:var(--primary);font-weight:600}
   .gauge{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
   .gauge .hole{position:absolute;inset:8px;background:var(--surface);border-radius:50%}
   .gauge span{position:relative;font-weight:800}
@@ -95,8 +96,8 @@
   .divider{height:1px;background:var(--border);margin:16px 0}
   .sechead{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px}
   .empty{color:var(--textSec);font-style:italic;padding:10px 0}
-  .modal{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
-  .sheet{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;width:100%;max-height:90%;overflow-y:auto}
+  .modal{position:absolute;inset:0;background:rgba(20,40,70,.35);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+  .sheet{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;width:100%;max-height:90%;overflow-y:auto;box-shadow:0 12px 40px rgba(20,45,80,.2)}
   .field{margin-bottom:10px}.field small{color:var(--textSec);display:block;margin-bottom:4px}
   .fadein{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   /* Dr. Owl mascot */
@@ -106,7 +107,7 @@
   .owl.compact .owlchar{width:54px;height:60px}
   .owlsvg{display:block;width:100%;height:100%;transform-origin:center bottom;animation:owlbob 3.4s ease-in-out infinite}
   .owlname{font-size:10px;color:var(--textSec)}
-  .owlbubble{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 13px;font-size:13px;max-width:300px;text-align:center;position:relative;line-height:1.45;color:var(--text)}
+  .owlbubble{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 13px;font-size:13px;max-width:300px;text-align:center;position:relative;line-height:1.45;color:var(--text);box-shadow:var(--shadow)}
   .owl:not(.compact) .owlbubble:after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%) rotate(45deg);width:12px;height:12px;background:var(--surface);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
   .owl.compact .owlbubble{text-align:left;max-width:230px}
   .eyelid,.brow,.beak,.tassel,.tasselend{transform-box:fill-box}
@@ -121,14 +122,14 @@
   @keyframes owlshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-3px) rotate(-2deg)}40%{transform:translateX(3px) rotate(2deg)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
   @keyframes owlhop{0%{transform:translateY(0)}35%{transform:translateY(-15px) rotate(-3deg)}70%{transform:translateY(0)}85%{transform:translateY(-5px)}100%{transform:translateY(0)}}
   @keyframes owltalk{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7) translateY(1px)}}
-  @keyframes concpulse{0%,100%{box-shadow:0 0 0 0 rgba(245,184,65,0)}50%{box-shadow:0 0 0 4px rgba(245,184,65,.16)}}
+  @keyframes concpulse{0%,100%{box-shadow:0 0 0 0 rgba(224,144,12,0)}50%{box-shadow:0 0 0 4px rgba(224,144,12,.18)}}
   .concchip{animation:concpulse 2.6s ease-in-out infinite}
   .owl.thinking .owlsvg{animation:owlbob 1.5s ease-in-out infinite}
   .owl.thinking .brow{transform:translateY(-2px)}
   .owl.alert .browL{transform:rotate(9deg) translateY(2px)}
   .owl.alert .browR{transform:rotate(-9deg) translateY(2px)}
   .owl.alert .eyelid{animation:none}
-  .owl.alert .owlbubble{border-color:rgba(255,107,107,.45)}
+  .owl.alert .owlbubble{border-color:rgba(226,61,66,.45)}
   .owl.alarmed .owlsvg{animation:owlshake .5s ease, owlbob 3.4s ease-in-out .5s infinite}
   .owl.alarmed .browL{transform:rotate(14deg) translateY(3px)}
   .owl.alarmed .browR{transform:rotate(-14deg) translateY(3px)}
@@ -229,8 +230,8 @@ function S(){return STR[state.lang]}
 // ================= helpers =================
 const el = document.getElementById('app');
 const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const matColor = m => m>=4?'var(--good)':m===3?'var(--primary)':m===2?'var(--warn)':'var(--danger)';
-const bandColor = s => s>=67?'var(--good)':s>=34?'var(--warn)':'var(--danger)';
+const matColor = m => m>=4?'#16A34A':m===3?'#1E6FD9':m===2?'#E0900C':'#E23D42';
+const bandColor = s => s>=67?'#16A34A':s>=34?'#E0900C':'#E23D42';
 function activeJuris(){return JURIS.filter(j=>j.always||state.juris.has(j.id))}
 function persist(){LS.set('lang',state.lang);LS.set('juris',[...state.juris]);LS.set('tol',state.tolerances);LS.set('ven',state.vendors)}
 
@@ -379,10 +380,10 @@ function owlSvg(){return `<svg viewBox="0 0 124 140" class="owlsvg" aria-hidden=
   <path class="beak" d="M62 58 l-5.5 6 q5.5 4.5 11 0 z" fill="#C98A2D" stroke="#20242e" stroke-width="2" stroke-linejoin="round"/>
   <rect x="52" y="20" width="20" height="9" rx="2" fill="#2b3040" stroke="#20242e" stroke-width="2"/>
   <path d="M33 20 L62 10 L91 20 L62 30 Z" fill="#333a4d" stroke="#20242e" stroke-width="2" stroke-linejoin="round"/>
-  <circle cx="62" cy="17" r="2.3" fill="#3DD6C4"/>
-  <path class="tassel" d="M62 17 q11 3 12 13" fill="none" stroke="#3DD6C4" stroke-width="2"/>
-  <circle class="tasselend" cx="74" cy="30" r="2.6" fill="#3DD6C4"/>
-  <path d="M56 80 l6 4 -6 4 z M68 80 l-6 4 6 4 z" fill="#3DD6C4" stroke="#20242e" stroke-width="1.5"/>
+  <circle cx="62" cy="17" r="2.3" fill="#0FB5A6"/>
+  <path class="tassel" d="M62 17 q11 3 12 13" fill="none" stroke="#0FB5A6" stroke-width="2"/>
+  <circle class="tasselend" cx="74" cy="30" r="2.6" fill="#0FB5A6"/>
+  <path d="M56 80 l6 4 -6 4 z M68 80 l-6 4 6 4 z" fill="#0FB5A6" stroke="#20242e" stroke-width="1.5"/>
 </svg>`;}
 function owlWidget(mood,line,compact){
   const cls='owl '+(mood||'idle')+(compact?' compact':'');
@@ -576,7 +577,7 @@ function viewAssistant(){ const s=S(),p=PILLARS[state.pillar];
 }
 function viewScanner(){ const s=S(); let result='';
   if(state.scanError)result=`<div style="color:var(--danger);margin-top:16px">${esc(state.scanError)}</div>`;
-  else if(state.scan){const c=state.scan.cls;const col=c.severity==='low'?'var(--good)':c.severity==='high'?'var(--danger)':'var(--warn)';
+  else if(state.scan){const c=state.scan.cls;const col=c.severity==='low'?'#16A34A':c.severity==='high'?'#E23D42':'#E0900C';
     const catLabel=c.category.replace('-',' ').replace(/^./,x=>x.toUpperCase()); const sevLabel=c.severity==='low'?s.low:c.severity==='high'?s.high:s.med;
     result=`<div class="card fadein" style="display:flex;gap:16px;margin-top:16px">
       <div style="text-align:center">${gauge(state.scan.score,96)}<div class="hint" style="margin-top:6px">${s.score}</div></div>
@@ -596,10 +597,10 @@ function viewScanner(){ const s=S(); let result='';
 }
 function viewTools(){ const s=S();
   const tol=state.tolerances.length? state.tolerances.map((t,i)=>{const objs=[t.rto&&'RTO '+t.rto,t.rpo&&'RPO '+t.rpo,t.mtpd&&'MTPD '+t.mtpd,t.srto&&'SRTO '+t.srto].filter(Boolean);
-    return `<div class="card between"><div><b>${esc(t.service)}</b><div style="margin-top:8px">${objs.length?objs.map(o=>`<span class="tag" style="color:var(--primary);background:#3DD6C422;border:1px solid #3DD6C480">${esc(o)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="tol" data-i="${i}">🗑</button></div>`}).join('') : `<div class="empty">${s.emptyTol}</div>`;
-  const ven=state.vendors.length? state.vendors.map((v,i)=>`<div class="card between"><div><b>${esc(v.vendor)}</b>${v.service?`<div class="hint" style="margin:2px 0 0">${esc(v.service)}</div>`:''}<div style="margin-top:8px">${(v.nth&&v.nth.length)?v.nth.map(p=>`<span class="tag" style="color:var(--accent);background:#6C8CFF22;border:1px solid #6C8CFF59">${esc(p)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="ven" data-i="${i}">🗑</button></div>`).join('') : `<div class="empty">${s.emptyVen}</div>`;
+    return `<div class="card between"><div><b>${esc(t.service)}</b><div style="margin-top:8px">${objs.length?objs.map(o=>`<span class="tag" style="color:var(--primary);background:#1E6FD91A;border:1px solid #1E6FD955">${esc(o)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="tol" data-i="${i}">🗑</button></div>`}).join('') : `<div class="empty">${s.emptyTol}</div>`;
+  const ven=state.vendors.length? state.vendors.map((v,i)=>`<div class="card between"><div><b>${esc(v.vendor)}</b>${v.service?`<div class="hint" style="margin:2px 0 0">${esc(v.service)}</div>`:''}<div style="margin-top:8px">${(v.nth&&v.nth.length)?v.nth.map(p=>`<span class="tag" style="color:#0A7F73;background:#0FB5A61A;border:1px solid #0FB5A555">${esc(p)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="ven" data-i="${i}">🗑</button></div>`).join('') : `<div class="empty">${s.emptyVen}</div>`;
   const risks=concentrationRisks(),acc=risks.length?'var(--warn)':'var(--good)';
-  const riskBody=risks.length? risks.map(r=>`<div style="margin-bottom:10px"><div class="row"><span class="tag" style="color:var(--danger);background:#FF6B6B22;border:1px solid #FF6B6B80;margin:0">${esc(r.display)}</span><span style="color:var(--danger);font-weight:600;font-size:12px">shared by ${r.vendors.length} vendors</span></div><div class="hint" style="margin-top:4px">${r.vendors.map(esc).join(' · ')}</div></div>`).join('') : `<div class="sub">${s.noconc}</div>`;
+  const riskBody=risks.length? risks.map(r=>`<div style="margin-bottom:10px"><div class="row"><span class="tag" style="color:var(--danger);background:#E23D421A;border:1px solid #E23D4255;margin:0">${esc(r.display)}</span><span style="color:var(--danger);font-weight:600;font-size:12px">shared by ${r.vendors.length} vendors</span></div><div class="hint" style="margin-top:4px">${r.vendors.map(esc).join(' · ')}</div></div>`).join('') : `<div class="sub">${s.noconc}</div>`;
   return `<div class="pad fadein"><div class="sechead">⏱️ ${s.tolTitle}</div><div style="height:8px"></div>${tol}
     <div style="text-align:right"><button class="btn ghost sm" data-act="addtol">+ ${s.add}</button></div><div class="divider"></div>
     <div class="sechead">🔗 ${s.nthTitle}</div><div style="height:8px"></div>${ven}
