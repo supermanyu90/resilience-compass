@@ -138,6 +138,10 @@
   .owl.happy .happyeye{opacity:1}
   .owl.happy .eyelid{animation:none}
   .owl.talking .beak{animation:owltalk .26s ease-in-out infinite}
+  .owlhelper{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surfaceAlt)}
+  .owlhelper .owl.compact{flex:1;min-width:0}
+  .owlhelper .owlbubble{flex:1;max-width:none;font-size:12px;padding:8px 11px}
+  .owlhelper .owlchar{width:44px;height:49px}
 </style>
 </head>
 <body>
@@ -205,6 +209,7 @@ const state = {
   pillar:0, messages:[], convo:[], assessments:{}, busy:false, complete:false,
   incidentText:'', likelihood:2, control:2, scan:null, scanError:null, pack:null, packBusy:false,
   tolerances: LS.get('tol', SEED_TOL.map(x=>({...x}))), vendors: LS.get('ven', SEED_VEN.map(v=>({...v,nth:[...v.nth]}))),
+  owlTip:{assistant:'',scanner:'',tools:'',busy:false},
   modal:null,
 };
 state.juris.add('iso22301');
@@ -380,6 +385,34 @@ function fmtFacDisplay(raw){return fmtFacilitator(raw.replace(/^\s*QUESTION:.*$/
 function lastQuestion(){for(let i=sim.log.length-1;i>=0;i--){const m=sim.log[i]; if(m.role==='fac'&&m.text){const q=m.text.match(/QUESTION:\s*([^\n]+)/i); if(q)return q[1].trim();}}return '';}
 function owlLineForSim(){ if(sim.busy)return 'Reading the situation…'; const q=lastQuestion(); return q||'Your move, team — what do you do?'; }
 function gaugeCount(score){const col=bandColor(score);return `<div class="gauge" style="width:84px;height:84px;background:conic-gradient(${col} ${score*3.6}deg, var(--surfaceAlt) 0)"><div class="hole"></div><span style="color:${col};font-size:26px" data-countup="${score}">0</span></div>`;}
+
+// ---- Dr. Owl as a live helper on the Advisor tabs (uses real Gemma) ----
+function defaultTip(tab){return tab==='assistant'?'Answer in the box below — or tap 💡 and I\'ll hint what a strong answer to this pillar looks like.'
+  :tab==='scanner'?'Paste an incident and I\'ll classify it. Tap 💡 for the details that help most.'
+  :'Map your vendors here — tap 💡 and I\'ll flag your biggest concentration risk.';}
+function helperOwl(tab){
+  const t=state.owlTip, busy=t.busy;
+  const line=busy?'Thinking…':(t[tab]||defaultTip(tab));
+  const disabled=(busy||state.busy)?'disabled':'';
+  const btn=`<button class="iconbtn" data-act="owltip" title="Ask Dr. Owl (Gemma)" ${disabled}>${busy?'…':(t[tab]?'↻':'💡')}</button>`;
+  return `<div class="owlhelper">${owlWidget(busy?'thinking':'idle', line, true)}${btn}</div>`;
+}
+async function fetchOwlTip(tab){
+  if(state.owlTip.busy||state.busy||state.modelStatus!=='ready')return;
+  state.owlTip.busy=true; render();
+  const ow=document.getElementById('owl'); if(ow)ow.classList.add('talking');
+  const lang=replyLang(); let prompt;
+  if(tab==='assistant'){const p=PILLARS[state.pillar];
+    prompt='You are Dr. Owl, a warm, concise operational-resilience coach for a bank. In 35 words or fewer, give one concrete tip on what a strong, regulator-aligned answer looks like for the pillar "'+p.title+'". Mention which of these regulators cares most: '+activeJuris().map(j=>j.name).join(', ')+'. Reply in '+lang+', first person, no preamble.';}
+  else if(tab==='scanner'){
+    prompt='You are Dr. Owl, a warm, concise resilience coach. In 35 words or fewer, tell the user what details to include when describing an operational incident so it can be classified and scored accurately. Reply in '+lang+', first person, no preamble.';}
+  else {const r=concentrationRisks();
+    prompt=r.length?('You are Dr. Owl, a warm resilience coach. In 40 words or fewer, warn about this concentration risk and suggest one concrete mitigation: "'+r[0].display+'" is shared by '+r[0].vendors.join(', ')+'. Reply in '+lang+', first person, no preamble.')
+      :('You are Dr. Owl, a warm resilience coach. In 35 words or fewer, explain why mapping Nth-party (fourth-party) dependencies matters for operational resilience. Reply in '+lang+', first person, no preamble.');}
+  try{ state.owlTip[tab]=await ollamaChat([{role:'user',content:prompt}],{temperature:0.6,onToken:(t2,full)=>{const b=document.getElementById('owlbubble'); if(b)b.textContent=full;}});
+  }catch(e){ state.owlTip[tab]='Hmm — I could not reach Gemma just now. Try 💡 again in a moment.'; }
+  state.owlTip.busy=false; render();
+}
 function simScroll(){const c=document.getElementById('simlog'); if(c)c.scrollTop=c.scrollHeight;}
 
 async function startSim(){
@@ -510,6 +543,7 @@ function viewAdvisor(){ const s=S(),tab=state.advTab;
       <div class="stab ${tab==='scanner'?'sel':''}" data-adv="scanner">🛰️ ${s.tabS}</div>
       <div class="stab ${tab==='tools'?'sel':''}" data-adv="tools">🛠️ ${s.tabT}</div>
     </div>
+    ${helperOwl(tab)}
     <div style="flex:1;min-height:0;overflow-y:auto">${body}</div></div>`;
 }
 function viewAssistant(){ const s=S(),p=PILLARS[state.pillar];
@@ -622,7 +656,8 @@ function bind(){
   const ls=document.getElementById('langsel'); if(ls)ls.onchange=()=>{state.lang=ls.value; persist(); render();};
   const fi=document.getElementById('seedimg'); if(fi)fi.onchange=e=>{const f=e.target.files&&e.target.files[0]; if(f)seedFromImage(f);};
   el.querySelectorAll('[data-adv]').forEach(n=>n.onclick=()=>{state.advTab=n.dataset.adv; render();
-    if(state.advTab==='assistant'&&!state.messages.length&&!state.complete&&!state.busy)openPillar();});
+    if(state.advTab==='assistant'&&!state.messages.length&&!state.complete&&!state.busy)openPillar();
+    else if((state.advTab==='scanner'||state.advTab==='tools')&&!state.owlTip[state.advTab]&&!state.owlTip.busy&&!state.busy)fetchOwlTip(state.advTab);});
   el.querySelectorAll('[data-seg]').forEach(n=>n.onclick=()=>{state[n.dataset.seg]=+n.dataset.v; const ta=document.getElementById('inc'); if(ta)state.incidentText=ta.value; render();});
   el.querySelectorAll('[data-del]').forEach(n=>n.onclick=()=>{const i=+n.dataset.i; if(n.dataset.del==='tol')state.tolerances.splice(i,1); else state.vendors.splice(i,1); persist(); render();});
   el.querySelectorAll('[data-act]').forEach(n=>n.onclick=()=>act(n.dataset.act));
@@ -630,7 +665,11 @@ function bind(){
 }
 function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
   switch(a){
-    case'toggleview': state.view=state.view==='sim'?'advisor':'sim'; render(); if(state.view==='advisor'&&state.advTab==='assistant'&&!state.messages.length&&!state.complete&&!state.busy)openPillar(); break;
+    case'toggleview': state.view=state.view==='sim'?'advisor':'sim'; render();
+      if(state.view==='advisor'){ if(state.advTab==='assistant'&&!state.messages.length&&!state.complete&&!state.busy)openPillar();
+        else if((state.advTab==='scanner'||state.advTab==='tools')&&!state.owlTip[state.advTab]&&!state.owlTip.busy&&!state.busy)fetchOwlTip(state.advTab); }
+      break;
+    case'owltip': fetchOwlTip(state.advTab); break;
     case'about': state.modal=aboutModal(); render(); break;
     case'closemodal': state.modal=null; render(); break;
     case'simstart': startSim(); break;
