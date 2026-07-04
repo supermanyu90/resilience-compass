@@ -3,11 +3,14 @@
 **An on‑device compliance copilot for banks.** Resilience Compass helps operational‑resilience and
 business‑continuity (BCM) teams self‑assess against the regulators that apply to them, triage incidents,
 and map vendor concentration risk — powered entirely by **Gemma running locally**, so the bank's most
-sensitive data never leaves the device.
+sensitive data never leaves the device. Its centerpiece is a **live crisis simulator**: Gemma invents a
+disaster tailored to your bank, runs the tabletop with you, grades your decisions against the regulators,
+and writes the board report — offline.
 
 > Built for Google's Gemma **Edge / On‑Device** hackathon track — *"Best mobile, web, or edge
 > application running Gemma locally for offline, privacy‑first inference."*
 
+- 🔴 **Live crisis simulator** — Gemma runs an interactive, grounded tabletop exercise and writes the after‑action board report.
 - 🔒 **Private by construction** — no network calls after the model loads; inputs, chats, and registers stay on the device.
 - 📶 **Works offline** — put the machine in airplane mode and it keeps answering.
 - 🌍 **6 languages** — English, हिन्दी, 简体中文, Español, Français, Português.
@@ -49,43 +52,44 @@ Gemma locally, closing that gap.
 
 ## What it does
 
-### 1. BCM Assistant (flagship)
-A guided self‑assessment across **10 resilience pillars** (governance, policy & scope, critical
-operations, business impact analysis, impact tolerance, risk assessment, third‑party management,
-BC/DR plans, testing, monitoring). For each pillar you describe your current practice in your own words;
-Gemma:
-- evaluates it against the **regulators you selected**,
-- **cites them by name and section** (ISO 22301 by clause; the principles‑based regimes by named theme),
-- extracts a **1–4 maturity score** (parsed from a structured `[[ASSESSMENT]]` tag and shown as a badge + citation chips),
-- and answers **free‑form questions** at any point instead of forcing a score.
+### 🔴 Crisis Simulator (the hero)
+An **interactive tabletop exercise** run entirely by on‑device Gemma. It:
+- invents a **severe‑but‑plausible** disruption **grounded in your real weak spot** — e.g. the AWS
+  single‑point‑of‑failure shared across FIS, Temenos and nCino;
+- runs the exercise **turn by turn** — it drops timed injects, you type your decisions, and it **assesses
+  each one against the named regulators** (ISO 22301 / HKMA / APRA / …) and **escalates** realistically;
+- ends by **synthesising an after‑action board report** — scenario, decisions & assessment, gaps vs
+  regulators (ISO by clause), **P1/P2/P3 remediation**, and an overall **resilience rating /100**.
 
-Replies stream in whichever of the 6 languages is selected — switch language mid‑session and the
-assistant's next reply follows.
+Regulators mandate exactly this kind of scenario testing — here it's instant, private, and offline. On a
+laptop with `gemma3:4b`: ~6 s to the first scenario, ~3 s per turn, ~10 s for the report.
 
-### 2. Incident Scanner
-Paste or describe an operational incident. Gemma classifies it on‑device into one of six categories
-(people, process, technology, third‑party, cyber, facilities) with a severity and impact area, returned
-as strict JSON. That combines with your chosen **likelihood** and **control maturity** into a **0–100
-resilience score**.
+### 🧰 The advisor toolkit (behind the hero)
+- **BCM Assistant** — a guided self‑assessment across **10 resilience pillars**; for each you describe
+  your practice and Gemma evaluates it against the regulators you picked, **cites them by name/clause**,
+  and extracts a **1–4 maturity score** (with citation chips). Free‑form questions welcome. Streams in the
+  selected language (switch mid‑session and the next reply follows).
+- **Incident Scanner** — paste an incident; Gemma returns strict‑JSON category/severity/impact, combined
+  with your likelihood + control maturity into a **0–100 resilience score**. A one‑click **Response Pack**
+  drafts root cause + regulator notification + customer comms + remediation.
+- **Tools** — an **Impact Tolerance Configurator** (RTO/RPO/MTPD/SRTO) and an **Nth‑Party Dependency
+  Mapper** with **concentration‑risk detection** (any provider used by 2+ vendors = a single point of
+  failure). These registers **ground** both the crisis scenario and the assistant.
 
-### 3. Tools panel
-- **Impact Tolerance Configurator** — record RTO / RPO / MTPD / SRTO per critical service.
-- **Nth‑Party Dependency Mapper** — map vendors and their Nth‑party providers, with **concentration‑risk
-  detection**: any provider depended on by **2+ vendors** is flagged as a single point of failure.
-- **Grounding loop** — these registers are fed back into the BCM Assistant's prompt, so when you reach
-  the *Impact Tolerance* or *Third‑Party* pillar, the model reasons about **your** actual data (e.g. "you
-  rely on AWS across FIS, Temenos and nCino — a concentration risk").
+### 👁️ On‑device vision
+On the Crisis Simulator, **"Seed from an architecture diagram"** lets Gemma **read an uploaded image**
+(architecture / vendor diagram) and rebuild your vendor map — perception on‑device, no cloud.
 
-Registers persist locally only (browser `localStorage` / on‑device storage), never synced.
+Everything persists locally only (browser `localStorage` / on‑device storage), never synced.
 
 ## Two implementations
 
 | | Web demo (`demo_preview/`) | Flutter mobile app (`lib/`) |
 |---|---|---|
 | **Runtime** | Real Gemma via **local Ollama** | **`flutter_gemma`** (LiteRT‑LM engine) |
-| **Model** | Auto‑detects newest installed Gemma (`gemma4:12b`, else `gemma3:4b`) | Small quantized Gemma bundled as an asset (e.g. Gemma 3 1B int4) |
-| **Status** | ✅ Verified working end‑to‑end | 🧩 Code‑complete; pending Flutter toolchain to compile |
-| **Best for** | A live, on‑laptop demo on `localhost` | The native on‑device story on a phone |
+| **Model** | Pinned to **`gemma3:4b`** for snappy live inference (falls back to newest Gemma if absent) | Small quantized Gemma bundled as an asset (e.g. Gemma 3 1B int4) |
+| **Status** | ✅ Verified working end‑to‑end (incl. the Crisis Simulator + on‑device vision) | 🧩 Code‑complete; pending Flutter toolchain to compile |
+| **Best for** | A live, on‑laptop crisis‑simulation demo on `localhost` | The native on‑device story on a phone |
 
 Both share the same domain model, prompt engineering, and parsing logic.
 
@@ -110,15 +114,17 @@ ollama pull gemma3:4b        # snappy (~3 GB). For the bigger model: ollama pull
 node demo_preview/serve.js
 #    → Resilience Compass demo → http://localhost:8422
 ```
-Open **http://localhost:8422** in Chrome → **Connect to on‑device Gemma** (it auto‑detects the model and
-warms it) → **Start**.
+Open **http://localhost:8422** in Chrome. It **auto‑connects** to the local model (the header shows a
+`gemma3:4b` chip once warm) and lands on the **Crisis Simulator** — press **Start the exercise**. Tap 🧰
+for the advisor toolkit (BCM Assistant / Incident Scanner / Tools); 🔴 returns to the simulator.
 
 > **Tip:** open in an **Incognito** window to load the seeded demo data (two tolerances and four vendors
 > where three share *AWS*, so the concentration flag and grounding light up immediately).
 
 ### Choosing a model
-The app auto‑selects the **newest** installed Gemma generation. Keep both installed and it uses
-`gemma4:12b`; remove it (or only install `gemma3:4b`) for faster streaming on a laptop.
+The app is **pinned to `gemma3:4b`** for snappy live inference; if it isn't installed, it falls back to
+the newest Gemma present. `gemma4:12b` is smarter but noticeably slower per turn on a laptop — keep the
+live demo on 4B.
 
 | Model | Download | Feel on a laptop |
 |---|---|---|
@@ -201,7 +207,7 @@ how many vendors share it.
 ```
 resilience_compass_mobile/
 ├─ demo_preview/            # Real-Gemma web demo (this is the live localhost artifact)
-│  ├─ index.html            #   Resilience Compass UI + Ollama inference + shared prompts/parsing
+│  ├─ index.html            #   Hero-first UI: Crisis Simulator + advisor toolkit + on-device vision + Ollama
 │  └─ serve.js              #   Zero-dep Node static server + streaming Ollama reverse-proxy
 ├─ lib/                     # Flutter app
 │  ├─ data/framework_data.dart      # 10 pillars, 6 jurisdictions, categories, disclaimer
@@ -239,8 +245,9 @@ resilience_compass_mobile/
 
 ## Status & roadmap
 
-- ✅ Web demo with **real local Gemma** — verified end‑to‑end (BCM evaluation with citations + maturity,
-  incident JSON classification, grounded concentration risk).
+- ✅ Web demo with **real local Gemma** — verified end‑to‑end: the **Crisis Simulator** (grounded scenario
+  → adaptive injects → regulator‑cited coaching → after‑action board report), on‑device **vision** seeding,
+  BCM evaluation with citations + maturity, incident JSON classification, and grounded concentration risk.
 - ✅ Flutter app — code‑complete across setup, assistant, scanner, tools, about.
 - ⏳ Compile & run the Flutter app on a device once a toolchain is available.
 - ⏳ Optional: port the original web prototype's fact‑checked dataset verbatim if provided.
