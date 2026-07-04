@@ -99,6 +99,45 @@
   .sheet{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;width:100%;max-height:90%;overflow-y:auto}
   .field{margin-bottom:10px}.field small{color:var(--textSec);display:block;margin-bottom:4px}
   .fadein{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  /* Dr. Owl mascot */
+  .owl{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .owl.compact{flex-direction:row;align-items:center;gap:10px}
+  .owlchar{width:88px;height:98px;flex:0 0 auto}
+  .owl.compact .owlchar{width:54px;height:60px}
+  .owlsvg{display:block;width:100%;height:100%;transform-origin:center bottom;animation:owlbob 3.4s ease-in-out infinite}
+  .owlname{font-size:10px;color:var(--textSec)}
+  .owlbubble{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 13px;font-size:13px;max-width:300px;text-align:center;position:relative;line-height:1.45;color:var(--text)}
+  .owl:not(.compact) .owlbubble:after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%) rotate(45deg);width:12px;height:12px;background:var(--surface);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .owl.compact .owlbubble{text-align:left;max-width:230px}
+  .eyelid,.brow,.beak,.tassel,.tasselend{transform-box:fill-box}
+  .eyelid{transform-origin:center top;transform:scaleY(0);animation:owlblink 4.8s infinite}
+  .brow{transform-origin:center;transition:transform .25s}
+  .beak{transform-origin:center top}
+  .happyeye{opacity:0}
+  .tassel,.tasselend{transform-origin:top center;animation:owlswing 3.8s ease-in-out infinite}
+  @keyframes owlbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes owlblink{0%,92%,100%{transform:scaleY(0)}94%,97%{transform:scaleY(1)}}
+  @keyframes owlswing{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(11deg)}}
+  @keyframes owlshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-3px) rotate(-2deg)}40%{transform:translateX(3px) rotate(2deg)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+  @keyframes owlhop{0%{transform:translateY(0)}35%{transform:translateY(-15px) rotate(-3deg)}70%{transform:translateY(0)}85%{transform:translateY(-5px)}100%{transform:translateY(0)}}
+  @keyframes owltalk{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7) translateY(1px)}}
+  @keyframes concpulse{0%,100%{box-shadow:0 0 0 0 rgba(245,184,65,0)}50%{box-shadow:0 0 0 4px rgba(245,184,65,.16)}}
+  .concchip{animation:concpulse 2.6s ease-in-out infinite}
+  .owl.thinking .owlsvg{animation:owlbob 1.5s ease-in-out infinite}
+  .owl.thinking .brow{transform:translateY(-2px)}
+  .owl.alert .browL{transform:rotate(9deg) translateY(2px)}
+  .owl.alert .browR{transform:rotate(-9deg) translateY(2px)}
+  .owl.alert .eyelid{animation:none}
+  .owl.alert .owlbubble{border-color:rgba(255,107,107,.45)}
+  .owl.alarmed .owlsvg{animation:owlshake .5s ease, owlbob 3.4s ease-in-out .5s infinite}
+  .owl.alarmed .browL{transform:rotate(14deg) translateY(3px)}
+  .owl.alarmed .browR{transform:rotate(-14deg) translateY(3px)}
+  .owl.alarmed .eyelid{animation:none}
+  .owl.happy .owlsvg{animation:owlhop .6s ease, owlbob 3.4s ease-in-out .6s infinite}
+  .owl.happy .pupil{opacity:0}
+  .owl.happy .happyeye{opacity:1}
+  .owl.happy .eyelid{animation:none}
+  .owl.talking .beak{animation:owltalk .26s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -311,6 +350,36 @@ function fmtReport(raw){return esc(raw)
   .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
   .replace(/\n/g,'<br>')
   .replace(/@@H@@/g,'<h3>').replace(/@@\/H@@/g,'</h3>');}
+
+// ---- Dr. Owl mascot (Gemma's voice) ----
+function owlSvg(){return `<svg viewBox="0 0 124 140" class="owlsvg" aria-hidden="true">
+  <ellipse cx="62" cy="94" rx="34" ry="36" fill="#8A6F4D" stroke="#20242e" stroke-width="2.5"/>
+  <ellipse cx="62" cy="103" rx="21" ry="23" fill="#E9DCBE" stroke="#20242e" stroke-width="2"/>
+  <path d="M50 128 l-4 6 M54 128 l0 7 M58 128 l4 6 M70 128 l-4 6 M74 128 l0 7 M78 128 l4 6" stroke="#20242e" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <circle cx="62" cy="50" r="30" fill="#8A6F4D" stroke="#20242e" stroke-width="2.5"/>
+  <g><circle cx="49" cy="51" r="11" fill="#fff" stroke="#20242e" stroke-width="2"/><circle class="pupil" cx="50.5" cy="52" r="4.8" fill="#20242e"/><circle cx="52" cy="50.4" r="1.5" fill="#fff"/><path class="happyeye" d="M40 53 q9 -8 18 0" fill="none" stroke="#20242e" stroke-width="2.5" stroke-linecap="round"/><rect class="eyelid" x="38" y="40" width="22" height="22" rx="11" fill="#8A6F4D"/></g>
+  <g><circle cx="75" cy="51" r="11" fill="#fff" stroke="#20242e" stroke-width="2"/><circle class="pupil" cx="76.5" cy="52" r="4.8" fill="#20242e"/><circle cx="78" cy="50.4" r="1.5" fill="#fff"/><path class="happyeye" d="M66 53 q9 -8 18 0" fill="none" stroke="#20242e" stroke-width="2.5" stroke-linecap="round"/><rect class="eyelid" x="64" y="40" width="22" height="22" rx="11" fill="#8A6F4D"/></g>
+  <path class="brow browL" d="M41 36 q8 -5 16 -1" fill="none" stroke="#20242e" stroke-width="2.6" stroke-linecap="round"/>
+  <path class="brow browR" d="M67 35 q8 -4 16 2" fill="none" stroke="#20242e" stroke-width="2.6" stroke-linecap="round"/>
+  <path class="beak" d="M62 58 l-5.5 6 q5.5 4.5 11 0 z" fill="#C98A2D" stroke="#20242e" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="52" y="20" width="20" height="9" rx="2" fill="#2b3040" stroke="#20242e" stroke-width="2"/>
+  <path d="M33 20 L62 10 L91 20 L62 30 Z" fill="#333a4d" stroke="#20242e" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="62" cy="17" r="2.3" fill="#3DD6C4"/>
+  <path class="tassel" d="M62 17 q11 3 12 13" fill="none" stroke="#3DD6C4" stroke-width="2"/>
+  <circle class="tasselend" cx="74" cy="30" r="2.6" fill="#3DD6C4"/>
+  <path d="M56 80 l6 4 -6 4 z M68 80 l-6 4 6 4 z" fill="#3DD6C4" stroke="#20242e" stroke-width="1.5"/>
+</svg>`;}
+function owlWidget(mood,line,compact){
+  const cls='owl '+(mood||'idle')+(compact?' compact':'');
+  const bubble=line?`<div class="owlbubble" id="owlbubble">${esc(line)}</div>`:'';
+  const inner=compact?`<div class="owlchar">${owlSvg()}</div>${bubble}`
+    :`${bubble}<div class="owlchar">${owlSvg()}</div><div class="owlname">Dr. Owl · powered by Gemma</div>`;
+  return `<div class="${cls}" id="owl">${inner}</div>`;
+}
+function fmtFacDisplay(raw){return fmtFacilitator(raw.replace(/^\s*QUESTION:.*$/gmi,'').trim());}
+function lastQuestion(){for(let i=sim.log.length-1;i>=0;i--){const m=sim.log[i]; if(m.role==='fac'&&m.text){const q=m.text.match(/QUESTION:\s*([^\n]+)/i); if(q)return q[1].trim();}}return '';}
+function owlLineForSim(){ if(sim.busy)return 'Reading the situation…'; const q=lastQuestion(); return q||'Your move, team — what do you do?'; }
+function gaugeCount(score){const col=bandColor(score);return `<div class="gauge" style="width:84px;height:84px;background:conic-gradient(${col} ${score*3.6}deg, var(--surfaceAlt) 0)"><div class="hole"></div><span style="color:${col};font-size:26px" data-countup="${score}">0</span></div>`;}
 function simScroll(){const c=document.getElementById('simlog'); if(c)c.scrollTop=c.scrollHeight;}
 
 async function startSim(){
@@ -323,8 +392,9 @@ async function simTurn(userContent, display){
   if(display) sim.log.push({role:'dec',text:userContent});
   const entry={role:'fac',text:'',streaming:true}; sim.log.push(entry);
   sim.busy=true; render(); simScroll();
+  const ow=document.getElementById('owl'); if(ow)ow.classList.add('talking');
   const idx=sim.log.length-1; let raw='';
-  try{ raw=await ollamaChat(sim.convo,{temperature:0.85,onToken:(t,full)=>{const n=document.getElementById('log-'+idx); if(n)n.innerHTML=fmtFacilitator(full)+'<span class="cursor"></span>'; simScroll();}});
+  try{ raw=await ollamaChat(sim.convo,{temperature:0.85,onToken:(t,full)=>{const n=document.getElementById('log-'+idx); if(n)n.innerHTML=fmtFacDisplay(full)+'<span class="cursor"></span>'; simScroll();}});
     sim.convo.push({role:'assistant',content:raw}); entry.text=raw;
   }catch(e){ entry.text='⚠️ '+e.message; }
   entry.streaming=false; sim.busy=false; render(); simScroll();
@@ -387,6 +457,8 @@ function viewIntro(){
   const risks=concentrationRisks();
   const svcs=state.tolerances.map(t=>t.service).filter(Boolean);
   return `<div class="pad fadein"><div class="hero">
+    ${owlWidget('idle','Hi, I\'m Dr. Owl. Let\'s run a live crisis drill for your bank — I\'ll grade your calls against the regulators.')}
+    <div style="height:14px"></div>
     <div class="herobadge">● LIVE EXERCISE</div>
     <h1 style="margin-top:12px">Crisis Simulator</h1>
     <p class="sub" style="line-height:1.5;margin:8px 0 0">Gemma runs a severe‑but‑plausible disruption tailored to your bank — on this device, offline. You make the calls; it reacts, escalates, and grades you against the regulators, then writes the board report.</p>
@@ -406,10 +478,11 @@ function viewIntro(){
 }
 function viewRunning(){
   const logs=sim.log.map((m,i)=>{ if(m.role==='dec')return `<div class="dec">${esc(m.text)}</div>`;
-    return `<div class="fac" id="log-${i}">${m.text?fmtFacilitator(m.text):'<span class="cursor"></span>'}</div>`; }).join('');
+    return `<div class="fac" id="log-${i}">${m.text?fmtFacDisplay(m.text):'<span class="cursor"></span>'}</div>`; }).join('');
   return `<div style="display:flex;flex-direction:column;height:100%">
-    <div class="pad" style="padding:12px 16px 8px"><div class="between"><div class="herobadge">● INJECT ${sim.turns+ (sim.phase==='running'?0:0)}</div>
-      <button class="btn ghost sm" data-act="endsim" ${sim.turns<1||sim.busy?'style="opacity:.4"':''}>End &amp; report →</button></div></div>
+    <div class="pad" style="padding:12px 16px 6px"><div class="between"><div class="herobadge">● INJECT ${sim.turns}</div>
+      <button class="btn ghost sm" data-act="endsim" ${sim.turns<1||sim.busy?'style="opacity:.4"':''}>End &amp; report →</button></div>
+      <div style="height:10px"></div>${owlWidget(sim.busy?'thinking':'alert', owlLineForSim(), true)}</div>
     <div class="simlog" id="simlog" style="flex:1;overflow-y:auto">${logs}</div>
     <div class="pad" style="padding:10px 14px 12px">
       <div class="row"><textarea id="decision" rows="1" placeholder="Your decision as the exec team…" ${sim.busy?'disabled':''}></textarea>
@@ -419,8 +492,8 @@ function viewRunning(){
 function viewReport(){
   return `<div class="pad fadein">
     <div class="between"><h2>After-action report</h2><span class="badge"><span class="dot"></span>on-device</span></div>
-    <div class="hint" style="margin-top:4px">Generated by Gemma from your exercise decisions.</div>
-    <div style="height:12px"></div>
+    <div class="hint" style="margin-top:4px">Dr. Owl synthesised this from your decisions — on device.</div>
+    ${sim.report?`<div class="between" style="margin:12px 0">${owlWidget('happy','Your board report is ready — solid work under pressure.',true)}${(()=>{const r=(sim.report.match(/(\d{1,3})\s*\/\s*100/)||[])[1];return r?`<div style="text-align:center;flex:0 0 auto">${gaugeCount(r)}<div class="hint" style="margin:2px 0 0">rating</div></div>`:'';})()}</div>`:'<div style="height:12px"></div>'}
     <div class="report" id="reportbody">${sim.report?fmtReport(sim.report):'<span class="cursor"></span> synthesising…'}</div>
     <div style="height:14px"></div>
     <div class="row"><button class="btn tonal sm" data-act="restartsim">↻ Run another</button>
@@ -553,6 +626,7 @@ function bind(){
   el.querySelectorAll('[data-seg]').forEach(n=>n.onclick=()=>{state[n.dataset.seg]=+n.dataset.v; const ta=document.getElementById('inc'); if(ta)state.incidentText=ta.value; render();});
   el.querySelectorAll('[data-del]').forEach(n=>n.onclick=()=>{const i=+n.dataset.i; if(n.dataset.del==='tol')state.tolerances.splice(i,1); else state.vendors.splice(i,1); persist(); render();});
   el.querySelectorAll('[data-act]').forEach(n=>n.onclick=()=>act(n.dataset.act));
+  el.querySelectorAll('[data-countup]').forEach(n=>{const to=+n.dataset.countup||0; let cur=0; const step=Math.max(1,Math.round(to/35)); const iv=setInterval(()=>{cur+=step; if(cur>=to){cur=to;clearInterval(iv);} n.textContent=cur;},26);});
 }
 function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
   switch(a){
