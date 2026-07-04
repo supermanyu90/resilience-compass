@@ -14,30 +14,31 @@
   html,body{margin:0;background:#05070d;color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
   .page{min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 12px;}
-  .banner{max-width:430px;width:100%;font-size:12px;color:var(--textSec);text-align:center;line-height:1.5}
+  .banner{max-width:440px;width:100%;font-size:12px;color:var(--textSec);text-align:center;line-height:1.5}
   .banner b{color:var(--good)}
-  .device{width:430px;max-width:100%;height:820px;background:var(--bg);border:1px solid var(--border);
+  .device{width:440px;max-width:100%;height:840px;background:var(--bg);border:1px solid var(--border);
     border-radius:28px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);position:relative}
-  .screen{flex:1;overflow-y:auto;overflow-x:hidden}
+  #app{flex:1;min-height:0;display:flex;flex-direction:column}
+  .body2{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
   .pad{padding:20px}
   h1{font-size:24px;font-weight:800;margin:0}
   h2{font-size:18px;font-weight:700;margin:0}
   .sub{color:var(--textSec)}
   .row{display:flex;align-items:center;gap:8px}
   .between{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;
-    background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.4);color:var(--good);font-size:12px;font-weight:600}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;
+    background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.4);color:var(--good);font-size:11px;font-weight:600}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--good)}
   .label{font-size:14px;font-weight:600;margin:0 0 8px}
   .hint{font-size:12px;color:var(--textSec);margin:0 0 8px}
-  .chip{padding:8px 12px;border-radius:999px;background:var(--surfaceAlt);border:1px solid var(--border);
-    color:var(--text);font-size:13px;cursor:pointer;user-select:none}
+  .chip{padding:8px 12px;border-radius:999px;background:var(--surfaceAlt);border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;user-select:none}
   .chip.sel{background:rgba(61,214,196,.18);border-color:var(--primary)}
   .wrap{display:flex;flex-wrap:wrap;gap:8px}
   .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:8px}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:14px;
-    background:var(--primary);color:#04231F;font-weight:600;border:none;cursor:pointer;font-size:14px;width:100%}
+    background:var(--primary);color:#04231F;font-weight:700;border:none;cursor:pointer;font-size:15px;width:100%}
   .btn:disabled{opacity:.5;cursor:default}
+  .btn.danger{background:var(--danger);color:#2A0A0A}
   .btn.tonal{background:rgba(61,214,196,.16);color:var(--primary);width:auto}
   .btn.ghost{background:transparent;color:var(--textSec);width:auto}
   .btn.sm{padding:8px 12px;font-size:13px;width:auto}
@@ -45,63 +46,72 @@
     border-radius:12px;padding:11px 12px;font-size:14px;font-family:inherit;outline:none}
   input:focus,textarea:focus{border-color:var(--primary)}
   textarea{resize:vertical}
-  .tile{background:var(--surfaceAlt);border:1px solid var(--border);border-radius:12px;padding:12px}
-  .checkrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
-  .cbox{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);flex:0 0 auto;margin-top:2px;
-    display:flex;align-items:center;justify-content:center;font-size:13px;color:#04231F}
-  .cbox.on{background:var(--primary);border-color:var(--primary)}
-  .cbox.lock{background:var(--surface);color:var(--textSec)}
   .pill{padding:3px 8px;border-radius:8px;font-size:10px;background:var(--surfaceAlt);color:var(--textSec)}
-  .progress{height:8px;border-radius:999px;background:var(--surfaceAlt);overflow:hidden}
-  .progress > i{display:block;height:100%;background:var(--primary);width:0;transition:width .2s}
-  .appbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
-  .appbar .icons{display:flex;gap:6px;align-items:center}
-  .iconbtn{background:transparent;border:none;color:var(--text);cursor:pointer;font-size:18px;padding:6px;border-radius:8px}
-  .tabbar{display:flex;border-top:1px solid var(--border);background:var(--surface)}
-  .tab{flex:1;text-align:center;padding:10px 4px;color:var(--textSec);cursor:pointer;font-size:12px}
-  .tab.sel{color:var(--primary)}
-  .tab .ic{font-size:18px;display:block;margin-bottom:2px}
-  .bubble{max-width:86%;padding:12px 14px;border-radius:16px;margin:6px 0;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+  .appbar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+  .appbar .icons{display:flex;gap:8px;align-items:center}
+  .iconbtn{background:transparent;border:none;color:var(--text);cursor:pointer;font-size:17px;padding:5px;border-radius:8px}
+  .modeltag{font-size:10px;color:var(--primary);background:rgba(61,214,196,.12);border:1px solid rgba(61,214,196,.3);padding:2px 6px;border-radius:6px}
+  /* hero */
+  .hero{background:radial-gradient(120% 120% at 0% 0%, #17202f 0%, #0B1220 60%);border:1px solid var(--border);border-radius:20px;padding:22px}
+  .herobadge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.09em;color:var(--danger);
+    background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.4);padding:4px 10px;border-radius:999px}
+  .concchip{display:inline-flex;align-items:center;gap:6px;background:rgba(245,184,65,.12);border:1px solid rgba(245,184,65,.45);
+    color:var(--warn);font-size:12px;font-weight:600;padding:6px 10px;border-radius:10px;margin-top:4px}
+  .steps{display:flex;gap:6px;margin:14px 0}
+  .steps > div{flex:1;height:4px;border-radius:2px;background:var(--surfaceAlt)}
+  .steps > div.on{background:var(--primary)}
+  .upload{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
+  .filebtn{display:inline-block;font-size:12px;color:var(--accent);cursor:pointer;text-decoration:underline}
+  /* sim log */
+  .simlog{display:flex;flex-direction:column;gap:10px;padding:0 16px 8px}
+  .fac{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:12px;padding:12px 14px;line-height:1.5;white-space:pre-wrap;font-size:14px}
+  .dec{align-self:flex-end;background:rgba(61,214,196,.14);border:1px solid rgba(61,214,196,.4);border-radius:12px;padding:10px 12px;max-width:88%;white-space:pre-wrap}
+  .faclabel{color:var(--primary);font-weight:800}
+  .injectlabel{color:var(--warn);font-weight:800}
+  .cursor{display:inline-block;width:7px;height:1em;background:var(--danger);vertical-align:text-bottom;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  /* report */
+  .report{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;line-height:1.55;font-size:14px}
+  .report h3{color:var(--primary);font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 4px}
+  .report h3:first-child{margin-top:0}
+  /* advisor */
+  .subtabs{display:flex;border-bottom:1px solid var(--border)}
+  .stab{flex:1;text-align:center;padding:11px 4px;color:var(--textSec);cursor:pointer;font-size:12px}
+  .stab.sel{color:var(--primary);border-bottom:2px solid var(--primary)}
+  .bubble{max-width:88%;padding:12px 14px;border-radius:16px;margin:6px 0;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
   .bubble.a{background:var(--surface);border:1px solid var(--border);align-self:flex-start}
   .bubble.u{background:rgba(61,214,196,.14);border:1px solid rgba(61,214,196,.4);align-self:flex-end}
   .chatcol{display:flex;flex-direction:column;padding:0 16px}
   .mbadge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-top:10px}
-  .cite{display:inline-block;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;margin:6px 6px 0 0;
-    background:rgba(108,140,255,.12);border:1px solid rgba(108,140,255,.35);color:var(--accent)}
+  .cite{display:inline-block;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;margin:6px 6px 0 0;background:rgba(108,140,255,.12);border:1px solid rgba(108,140,255,.35);color:var(--accent)}
   .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden}
   .seg > div{flex:1;text-align:center;padding:9px 4px;cursor:pointer;font-size:13px;color:var(--text);border-right:1px solid var(--border)}
   .seg > div:last-child{border-right:none}
   .seg > div.sel{background:rgba(61,214,196,.18);color:var(--primary);font-weight:600}
   .gauge{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
   .gauge .hole{position:absolute;inset:8px;background:var(--surface);border-radius:50%}
-  .gauge span{position:relative;font-size:28px;font-weight:800}
+  .gauge span{position:relative;font-weight:800}
   .tag{display:inline-block;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;margin:0 6px 6px 0}
   .divider{height:1px;background:var(--border);margin:16px 0}
   .sechead{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px}
   .empty{color:var(--textSec);font-style:italic;padding:10px 0}
   .modal{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
   .sheet{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;width:100%;max-height:90%;overflow-y:auto}
-  .field{margin-bottom:10px}
-  .field small{color:var(--textSec);display:block;margin-bottom:4px}
-  .cursor{display:inline-block;width:7px;height:1em;background:var(--primary);vertical-align:text-bottom;animation:blink 1s steps(1) infinite}
-  @keyframes blink{50%{opacity:0}}
-  .fadein{animation:fade .25s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-  .modeltag{font-size:10px;color:var(--primary);background:rgba(61,214,196,.12);border:1px solid rgba(61,214,196,.3);padding:2px 6px;border-radius:6px}
+  .field{margin-bottom:10px}.field small{color:var(--textSec);display:block;margin-bottom:4px}
+  .fadein{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 <div class="page">
   <div class="banner">
-    <b>Real on-device Gemma via local Ollama.</b> Every reply below is generated by Gemma running on
-    this machine — nothing is sent to a server, and it works in airplane mode once the model is pulled.
-    Scoring, concentration-risk, i18n and persistence run in the browser.
+    <b>Real on-device Gemma via local Ollama.</b> The crisis simulation, coaching and report below are
+    generated by Gemma running on this machine — offline, private. Nothing is sent to a server.
   </div>
-  <div class="device"><div id="app" class="screen"></div></div>
+  <div class="device"><div id="app"></div></div>
 </div>
 
 <script>
-// ================= data (ported from the Flutter app) =================
+// ================= data =================
 const PILLARS = [
   {id:'governance',title:'Governance & Board Oversight',prompt:'How does the board and senior management own and oversee operational resilience?'},
   {id:'policy-scope',title:'Policy & Scope',prompt:'Is there a documented resilience/BCM policy, and how is its scope defined?'},
@@ -115,16 +125,15 @@ const PILLARS = [
   {id:'monitoring',title:'Monitoring, Reporting & Continuous Improvement',prompt:'How is resilience monitored, reported to the board, and continuously improved?'},
 ];
 const JURIS = [
-  {id:'iso22301',name:'ISO 22301:2019',region:'Baseline (always on)',ref:'ISO 22301:2019 — clause references',clause:true,always:true},
-  {id:'hkma',name:'HKMA',region:'Hong Kong',ref:'HKMA SPM OR-2 (Operational Resilience)',clause:false},
-  {id:'mas',name:'MAS',region:'Singapore',ref:'MAS Operational Resilience / ORM Guidelines',clause:false},
-  {id:'apra',name:'APRA',region:'Australia',ref:'APRA CPS 230 (Operational Risk Management)',clause:false},
-  {id:'rbi',name:'RBI',region:'India',ref:'RBI Guidance Note on Op. Resilience (Apr 2024)',clause:false},
-  {id:'us_interagency',name:'Fed / OCC / FDIC',region:'United States',ref:'Interagency Paper — Sound Practices',clause:false},
+  {id:'iso22301',name:'ISO 22301:2019',region:'Baseline',ref:'ISO 22301:2019 — clause references',clause:true,always:true},
+  {id:'hkma',name:'HKMA',region:'Hong Kong',ref:'HKMA SPM OR-2',clause:false},
+  {id:'mas',name:'MAS',region:'Singapore',ref:'MAS Operational Resilience / ORM',clause:false},
+  {id:'apra',name:'APRA',region:'Australia',ref:'APRA CPS 230',clause:false},
+  {id:'rbi',name:'RBI',region:'India',ref:'RBI Guidance Note (Apr 2024)',clause:false},
+  {id:'us_interagency',name:'Fed / OCC / FDIC',region:'United States',ref:'Interagency Sound Practices',clause:false},
 ];
 const CATEGORIES = ['people','process','technology','third-party','cyber','facilities'];
-const DISCLAIMER = "ISO 22301 references are clause-numbered; HKMA, MAS, APRA, RBI and the US interagency guidance are principles-based (references point to a named section, not a clause number). Resilience Compass is a self-assessment aid — not legal advice or a certification audit — and does not guarantee regulatory compliance.";
-// Seeded demo data (used only when the browser has no saved Tools entries — e.g. a fresh/Incognito tab).
+const DISCLAIMER = "ISO 22301 references are clause-numbered; HKMA, MAS, APRA, RBI and the US interagency guidance are principles-based. Resilience Compass is a self-assessment aid — not legal advice or a certification audit — and does not guarantee regulatory compliance.";
 const SEED_TOL = [
   {service:'Retail payments (FPS / UPI)', rto:'2h', rpo:'15m', mtpd:'12h', srto:'4h'},
   {service:'Online & mobile banking', rto:'4h', rpo:'30m', mtpd:'24h', srto:''},
@@ -137,14 +146,13 @@ const SEED_VEN = [
 ];
 const LANGS = {en:'English',hi:'हिन्दी',zh:'简体中文',es:'Español',fr:'Français',pt:'Português'};
 const REPLY = {en:'English',hi:'Hindi (हिन्दी)',zh:'Simplified Chinese (简体中文)',es:'Spanish (Español)',fr:'French (Français)',pt:'Portuguese (Português)'};
-
 const STR = {
- en:{sub:'On-device operational resilience',offline:'Offline · On-device',setup:'Set up your assessment',language:'Language',juris:'Regulatory jurisdictions',jurishint:'Select all that apply. ISO 22301 is always included as the baseline.',iso:'Baseline · always on',load:'Connect to on-device Gemma',loading:'Connecting to Gemma…',ready:'Gemma ready — running locally',start:'Start',tabA:'Assistant',tabS:'Scanner',tabT:'Tools',aTitle:'BCM Assistant',aIntro:'A guided self-assessment across 10 resilience pillars. Answer in your own words, or ask a question at any time.',answer:'Describe your current practice — or ask a question…',send:'Send',maturity:'Maturity',next:'Next pillar',skip:'Skip',done:'Assessment complete',overall:'Overall readiness',sTitle:'Incident Scanner',sIntro:'Paste or describe an operational incident. Gemma classifies it on-device and scores resilience.',incident:'Paste or describe the incident…',analyze:'Analyze',category:'Category',severity:'Severity',impact:'Impact area',score:'Resilience score',likelihood:'Likelihood',control:'Control maturity',low:'Low',med:'Medium',high:'High',about:'About & Privacy',privacy:'All processing happens on this device. Your inputs, chats and registers never leave your machine.',disc:'Compliance disclaimer',tolTitle:'Impact Tolerance Configurator',nthTitle:'Nth-Party Dependency Mapper',service:'Critical service',vendor:'Vendor',provided:'Service provided',nth:'Nth-party dependencies (comma-separated)',add:'Add',conc:'Concentration risk',noconc:'No shared Nth-party dependencies detected.',emptyTol:'No critical services configured yet.',emptyVen:'No vendors mapped yet.',pillar:'Pillar',of:'of',toolsIntro:'Configure impact tolerances and map Nth-party dependencies. This data grounds the Assistant’s Tolerance and Third-Party pillars.'},
- hi:{sub:'डिवाइस पर परिचालन लचीलापन',offline:'ऑफ़लाइन · डिवाइस पर',setup:'अपना आकलन सेट करें',language:'भाषा',juris:'नियामक क्षेत्राधिकार',jurishint:'जो लागू हों उन्हें चुनें। ISO 22301 हमेशा आधार के रूप में शामिल रहता है।',iso:'आधार · हमेशा सक्रिय',load:'डिवाइस पर Gemma से कनेक्ट करें',loading:'Gemma से कनेक्ट हो रहा है…',ready:'Gemma तैयार — स्थानीय रूप से चल रहा है',start:'शुरू करें',tabA:'सहायक',tabS:'स्कैनर',tabT:'उपकरण',aTitle:'BCM सहायक',aIntro:'10 लचीलापन स्तंभों में एक निर्देशित स्व-आकलन। अपने शब्दों में उत्तर दें, या कभी भी प्रश्न पूछें।',answer:'अपनी वर्तमान प्रथा बताएं — या प्रश्न पूछें…',send:'भेजें',maturity:'परिपक्वता',next:'अगला स्तंभ',skip:'छोड़ें',done:'आकलन पूर्ण',overall:'समग्र तैयारी',sTitle:'घटना स्कैनर',sIntro:'किसी परिचालन घटना को चिपकाएँ या वर्णित करें। Gemma इसे डिवाइस पर वर्गीकृत करता है और लचीलापन अंक देता है।',incident:'घटना चिपकाएँ या वर्णन करें…',analyze:'विश्लेषण करें',category:'श्रेणी',severity:'गंभीरता',impact:'प्रभाव क्षेत्र',score:'लचीलापन अंक',likelihood:'संभावना',control:'नियंत्रण परिपक्वता',low:'निम्न',med:'मध्यम',high:'उच्च',about:'परिचय और गोपनीयता',privacy:'सभी प्रसंस्करण इसी डिवाइस पर होता है। आपके इनपुट, चैट और रजिस्टर कभी आपकी मशीन से बाहर नहीं जाते।',disc:'अनुपालन अस्वीकरण',tolTitle:'प्रभाव सहनशीलता कॉन्फ़िगरेटर',nthTitle:'Nth-पक्ष निर्भरता मैपर',service:'महत्वपूर्ण सेवा',vendor:'विक्रेता',provided:'प्रदान की गई सेवा',nth:'Nth-पक्ष निर्भरताएँ (अल्पविराम से अलग)',add:'जोड़ें',conc:'संकेंद्रण जोखिम',noconc:'कोई साझा Nth-पक्ष निर्भरता नहीं मिली।',emptyTol:'अभी तक कोई महत्वपूर्ण सेवा कॉन्फ़िगर नहीं की गई।',emptyVen:'अभी तक कोई विक्रेता मैप नहीं किया गया।',pillar:'स्तंभ',of:'/',toolsIntro:'प्रभाव सहनशीलता कॉन्फ़िगर करें और Nth-पक्ष निर्भरताएँ मैप करें। यह डेटा सहायक के सहनशीलता और तृतीय-पक्ष स्तंभों को आधार देता है।'},
- zh:{sub:'设备端运营韧性',offline:'离线 · 设备端',setup:'设置您的评估',language:'语言',juris:'监管辖区',jurishint:'选择所有适用项。ISO 22301 始终作为基准包含在内。',iso:'基准 · 始终启用',load:'连接设备端 Gemma',loading:'正在连接 Gemma…',ready:'Gemma 就绪 — 本地运行',start:'开始',tabA:'助手',tabS:'扫描器',tabT:'工具',aTitle:'BCM 助手',aIntro:'在 10 个韧性支柱上进行引导式自我评估。用您自己的话回答，或随时提问。',answer:'描述您目前的做法 — 或提出问题…',send:'发送',maturity:'成熟度',next:'下一支柱',skip:'跳过',done:'评估完成',overall:'整体准备度',sTitle:'事件扫描器',sIntro:'粘贴或描述一个运营事件。Gemma 在设备端对其分类并给出韧性评分。',incident:'粘贴或描述事件…',analyze:'分析',category:'类别',severity:'严重程度',impact:'影响领域',score:'韧性评分',likelihood:'可能性',control:'控制成熟度',low:'低',med:'中',high:'高',about:'关于与隐私',privacy:'所有处理都在本设备上进行。您的输入、对话和登记簿绝不会离开您的机器。',disc:'合规免责声明',tolTitle:'影响容忍度配置器',nthTitle:'第 N 方依赖映射器',service:'关键服务',vendor:'供应商',provided:'提供的服务',nth:'第 N 方依赖（用逗号分隔）',add:'添加',conc:'集中度风险',noconc:'未检测到共用的第 N 方依赖。',emptyTol:'尚未配置关键服务。',emptyVen:'尚未映射供应商。',pillar:'支柱',of:'/',toolsIntro:'配置影响容忍度并映射第 N 方依赖。这些数据将为助手的容忍度与第三方支柱提供依据。'},
- es:{sub:'Resiliencia operativa en el dispositivo',offline:'Sin conexión · En el dispositivo',setup:'Configura tu evaluación',language:'Idioma',juris:'Jurisdicciones regulatorias',jurishint:'Selecciona todas las que apliquen. ISO 22301 siempre se incluye como base.',iso:'Base · siempre activa',load:'Conectar con Gemma en el dispositivo',loading:'Conectando con Gemma…',ready:'Gemma lista — ejecutándose localmente',start:'Comenzar',tabA:'Asistente',tabS:'Escáner',tabT:'Herramientas',aTitle:'Asistente BCM',aIntro:'Una autoevaluación guiada por los 10 pilares de resiliencia. Responde con tus palabras o haz una pregunta en cualquier momento.',answer:'Describe tu práctica actual — o haz una pregunta…',send:'Enviar',maturity:'Madurez',next:'Siguiente pilar',skip:'Omitir',done:'Evaluación completa',overall:'Preparación general',sTitle:'Escáner de incidentes',sIntro:'Pega o describe un incidente operativo. Gemma lo clasifica en el dispositivo y calcula la resiliencia.',incident:'Pega o describe el incidente…',analyze:'Analizar',category:'Categoría',severity:'Severidad',impact:'Área de impacto',score:'Puntuación de resiliencia',likelihood:'Probabilidad',control:'Madurez del control',low:'Baja',med:'Media',high:'Alta',about:'Acerca de y privacidad',privacy:'Todo el procesamiento ocurre en este dispositivo. Tus entradas, chats y registros nunca salen de tu máquina.',disc:'Aviso de cumplimiento',tolTitle:'Configurador de tolerancia de impacto',nthTitle:'Mapeador de dependencias de N-ésima parte',service:'Servicio crítico',vendor:'Proveedor',provided:'Servicio prestado',nth:'Dependencias de N-ésima parte (separadas por comas)',add:'Añadir',conc:'Riesgo de concentración',noconc:'No se detectaron dependencias de N-ésima parte compartidas.',emptyTol:'Aún no hay servicios críticos configurados.',emptyVen:'Aún no hay proveedores mapeados.',pillar:'Pilar',of:'de',toolsIntro:'Configura las tolerancias de impacto y mapea las dependencias de N-ésima parte. Estos datos fundamentan los pilares de Tolerancia y Terceros del Asistente.'},
- fr:{sub:'Résilience opérationnelle sur l’appareil',offline:'Hors ligne · Sur l’appareil',setup:'Configurez votre évaluation',language:'Langue',juris:'Juridictions réglementaires',jurishint:'Sélectionnez toutes celles qui s’appliquent. ISO 22301 est toujours incluse comme référence.',iso:'Référence · toujours active',load:'Se connecter à Gemma sur l’appareil',loading:'Connexion à Gemma…',ready:'Gemma prête — exécution locale',start:'Commencer',tabA:'Assistant',tabS:'Scanner',tabT:'Outils',aTitle:'Assistant BCM',aIntro:'Une auto-évaluation guidée sur les 10 piliers de résilience. Répondez avec vos mots ou posez une question à tout moment.',answer:'Décrivez votre pratique actuelle — ou posez une question…',send:'Envoyer',maturity:'Maturité',next:'Pilier suivant',skip:'Passer',done:'Évaluation terminée',overall:'Préparation globale',sTitle:'Scanner d’incidents',sIntro:'Collez ou décrivez un incident opérationnel. Gemma le classe sur l’appareil et évalue la résilience.',incident:'Collez ou décrivez l’incident…',analyze:'Analyser',category:'Catégorie',severity:'Gravité',impact:'Zone d’impact',score:'Score de résilience',likelihood:'Probabilité',control:'Maturité du contrôle',low:'Faible',med:'Moyenne',high:'Élevée',about:'À propos et confidentialité',privacy:'Tout le traitement se fait sur cet appareil. Vos saisies, discussions et registres ne quittent jamais votre machine.',disc:'Avertissement de conformité',tolTitle:'Configurateur de tolérance d’impact',nthTitle:'Cartographe des dépendances de énième partie',service:'Service critique',vendor:'Fournisseur',provided:'Service fourni',nth:'Dépendances de énième partie (séparées par des virgules)',add:'Ajouter',conc:'Risque de concentration',noconc:'Aucune dépendance de énième partie partagée détectée.',emptyTol:'Aucun service critique configuré pour l’instant.',emptyVen:'Aucun fournisseur cartographié pour l’instant.',pillar:'Pilier',of:'sur',toolsIntro:'Configurez les tolérances d’impact et cartographiez les dépendances de énième partie. Ces données alimentent les piliers Tolérance et Tiers de l’Assistant.'},
- pt:{sub:'Resiliência operacional no dispositivo',offline:'Offline · No dispositivo',setup:'Configure sua avaliação',language:'Idioma',juris:'Jurisdições regulatórias',jurishint:'Selecione todas as aplicáveis. A ISO 22301 é sempre incluída como base.',iso:'Base · sempre ativa',load:'Conectar ao Gemma no dispositivo',loading:'Conectando ao Gemma…',ready:'Gemma pronto — executando localmente',start:'Começar',tabA:'Assistente',tabS:'Scanner',tabT:'Ferramentas',aTitle:'Assistente BCM',aIntro:'Uma autoavaliação guiada pelos 10 pilares de resiliência. Responda com suas palavras ou faça uma pergunta a qualquer momento.',answer:'Descreva sua prática atual — ou faça uma pergunta…',send:'Enviar',maturity:'Maturidade',next:'Próximo pilar',skip:'Pular',done:'Avaliação concluída',overall:'Prontidão geral',sTitle:'Scanner de incidentes',sIntro:'Cole ou descreva um incidente operacional. O Gemma o classifica no dispositivo e pontua a resiliência.',incident:'Cole ou descreva o incidente…',analyze:'Analisar',category:'Categoria',severity:'Severidade',impact:'Área de impacto',score:'Pontuação de resiliência',likelihood:'Probabilidade',control:'Maturidade do controle',low:'Baixa',med:'Média',high:'Alta',about:'Sobre e privacidade',privacy:'Todo o processamento acontece neste dispositivo. Suas entradas, conversas e registros nunca saem da sua máquina.',disc:'Aviso de conformidade',tolTitle:'Configurador de tolerância de impacto',nthTitle:'Mapeador de dependências de enésima parte',service:'Serviço crítico',vendor:'Fornecedor',provided:'Serviço prestado',nth:'Dependências de enésima parte (separadas por vírgulas)',add:'Adicionar',conc:'Risco de concentração',noconc:'Nenhuma dependência de enésima parte compartilhada detectada.',emptyTol:'Nenhum serviço crítico configurado ainda.',emptyVen:'Nenhum fornecedor mapeado ainda.',pillar:'Pilar',of:'de',toolsIntro:'Configure as tolerâncias de impacto e mapeie as dependências de enésima parte. Esses dados fundamentam os pilares de Tolerância e Terceiros do Assistente.'},
+ en:{offline:'Offline · On-device',tabA:'Assistant',tabS:'Scanner',tabT:'Tools',answer:'Describe your current practice — or ask a question…',send:'Send',maturity:'Maturity',next:'Next pillar',skip:'Skip',done:'Assessment complete',overall:'Overall readiness',sIntro:'Paste or describe an operational incident. Gemma classifies it on-device and scores resilience.',incident:'Paste or describe the incident…',analyze:'Analyze',category:'Category',severity:'Severity',impact:'Impact area',score:'Resilience score',likelihood:'Likelihood',control:'Control maturity',low:'Low',med:'Medium',high:'High',privacy:'All processing happens on this device. Your inputs never leave your machine.',disc:'Compliance disclaimer',tolTitle:'Impact Tolerance Configurator',nthTitle:'Nth-Party Dependency Mapper',service:'Critical service',vendor:'Vendor',provided:'Service provided',nth:'Nth-party dependencies (comma-separated)',add:'Add',conc:'Concentration risk',noconc:'No shared Nth-party dependencies detected.',emptyTol:'No critical services configured yet.',emptyVen:'No vendors mapped yet.',pillar:'Pillar',of:'of',pack:'Generate response pack'},
+ hi:{offline:'ऑफ़लाइन · डिवाइस पर',tabA:'सहायक',tabS:'स्कैनर',tabT:'उपकरण',answer:'अपनी वर्तमान प्रथा बताएं — या प्रश्न पूछें…',send:'भेजें',maturity:'परिपक्वता',next:'अगला स्तंभ',skip:'छोड़ें',done:'आकलन पूर्ण',overall:'समग्र तैयारी',sIntro:'किसी परिचालन घटना को चिपकाएँ। Gemma इसे डिवाइस पर वर्गीकृत करता है।',incident:'घटना चिपकाएँ या वर्णन करें…',analyze:'विश्लेषण करें',category:'श्रेणी',severity:'गंभीरता',impact:'प्रभाव क्षेत्र',score:'लचीलापन अंक',likelihood:'संभावना',control:'नियंत्रण परिपक्वता',low:'निम्न',med:'मध्यम',high:'उच्च',privacy:'सभी प्रसंस्करण इसी डिवाइस पर होता है।',disc:'अनुपालन अस्वीकरण',tolTitle:'प्रभाव सहनशीलता कॉन्फ़िगरेटर',nthTitle:'Nth-पक्ष निर्भरता मैपर',service:'महत्वपूर्ण सेवा',vendor:'विक्रेता',provided:'प्रदान की गई सेवा',nth:'Nth-पक्ष निर्भरताएँ (अल्पविराम से अलग)',add:'जोड़ें',conc:'संकेंद्रण जोखिम',noconc:'कोई साझा Nth-पक्ष निर्भरता नहीं मिली।',emptyTol:'अभी तक कोई सेवा कॉन्फ़िगर नहीं की गई।',emptyVen:'अभी तक कोई विक्रेता मैप नहीं किया गया।',pillar:'स्तंभ',of:'/',pack:'प्रतिक्रिया पैक बनाएं'},
+ zh:{offline:'离线 · 设备端',tabA:'助手',tabS:'扫描器',tabT:'工具',answer:'描述您目前的做法 — 或提出问题…',send:'发送',maturity:'成熟度',next:'下一支柱',skip:'跳过',done:'评估完成',overall:'整体准备度',sIntro:'粘贴或描述一个运营事件。Gemma 在设备端对其分类。',incident:'粘贴或描述事件…',analyze:'分析',category:'类别',severity:'严重程度',impact:'影响领域',score:'韧性评分',likelihood:'可能性',control:'控制成熟度',low:'低',med:'中',high:'高',privacy:'所有处理都在本设备上进行。',disc:'合规免责声明',tolTitle:'影响容忍度配置器',nthTitle:'第 N 方依赖映射器',service:'关键服务',vendor:'供应商',provided:'提供的服务',nth:'第 N 方依赖（用逗号分隔）',add:'添加',conc:'集中度风险',noconc:'未检测到共用的第 N 方依赖。',emptyTol:'尚未配置关键服务。',emptyVen:'尚未映射供应商。',pillar:'支柱',of:'/',pack:'生成响应包'},
+ es:{offline:'Sin conexión · En el dispositivo',tabA:'Asistente',tabS:'Escáner',tabT:'Herramientas',answer:'Describe tu práctica actual — o haz una pregunta…',send:'Enviar',maturity:'Madurez',next:'Siguiente pilar',skip:'Omitir',done:'Evaluación completa',overall:'Preparación general',sIntro:'Pega o describe un incidente operativo. Gemma lo clasifica en el dispositivo.',incident:'Pega o describe el incidente…',analyze:'Analizar',category:'Categoría',severity:'Severidad',impact:'Área de impacto',score:'Puntuación de resiliencia',likelihood:'Probabilidad',control:'Madurez del control',low:'Baja',med:'Media',high:'Alta',privacy:'Todo el procesamiento ocurre en este dispositivo.',disc:'Aviso de cumplimiento',tolTitle:'Configurador de tolerancia de impacto',nthTitle:'Mapeador de dependencias de N-ésima parte',service:'Servicio crítico',vendor:'Proveedor',provided:'Servicio prestado',nth:'Dependencias de N-ésima parte (separadas por comas)',add:'Añadir',conc:'Riesgo de concentración',noconc:'No se detectaron dependencias compartidas.',emptyTol:'Aún no hay servicios configurados.',emptyVen:'Aún no hay proveedores mapeados.',pillar:'Pilar',of:'de',pack:'Generar paquete de respuesta'},
+ fr:{offline:'Hors ligne · Sur l’appareil',tabA:'Assistant',tabS:'Scanner',tabT:'Outils',answer:'Décrivez votre pratique actuelle — ou posez une question…',send:'Envoyer',maturity:'Maturité',next:'Pilier suivant',skip:'Passer',done:'Évaluation terminée',overall:'Préparation globale',sIntro:'Collez ou décrivez un incident. Gemma le classe sur l’appareil.',incident:'Collez ou décrivez l’incident…',analyze:'Analyser',category:'Catégorie',severity:'Gravité',impact:'Zone d’impact',score:'Score de résilience',likelihood:'Probabilité',control:'Maturité du contrôle',low:'Faible',med:'Moyenne',high:'Élevée',privacy:'Tout le traitement se fait sur cet appareil.',disc:'Avertissement de conformité',tolTitle:'Configurateur de tolérance d’impact',nthTitle:'Cartographe des dépendances de énième partie',service:'Service critique',vendor:'Fournisseur',provided:'Service fourni',nth:'Dépendances de énième partie (séparées par des virgules)',add:'Ajouter',conc:'Risque de concentration',noconc:'Aucune dépendance partagée détectée.',emptyTol:'Aucun service configuré.',emptyVen:'Aucun fournisseur cartographié.',pillar:'Pilier',of:'sur',pack:'Générer le pack de réponse'},
+ pt:{offline:'Offline · No dispositivo',tabA:'Assistente',tabS:'Scanner',tabT:'Ferramentas',answer:'Descreva sua prática atual — ou faça uma pergunta…',send:'Enviar',maturity:'Maturidade',next:'Próximo pilar',skip:'Pular',done:'Avaliação concluída',overall:'Prontidão geral',sIntro:'Cole ou descreva um incidente. O Gemma o classifica no dispositivo.',incident:'Cole ou descreva o incidente…',analyze:'Analisar',category:'Categoria',severity:'Severidade',impact:'Área de impacto',score:'Pontuação de resiliência',likelihood:'Probabilidade',control:'Maturidade do controle',low:'Baixa',med:'Média',high:'Alta',privacy:'Todo o processamento acontece neste dispositivo.',disc:'Aviso de conformidade',tolTitle:'Configurador de tolerância de impacto',nthTitle:'Mapeador de dependências de enésima parte',service:'Serviço crítico',vendor:'Fornecedor',provided:'Serviço prestado',nth:'Dependências de enésima parte (separadas por vírgulas)',add:'Adicionar',conc:'Risco de concentração',noconc:'Nenhuma dependência compartilhada detectada.',emptyTol:'Nenhum serviço configurado.',emptyVen:'Nenhum fornecedor mapeado.',pillar:'Pilar',of:'de',pack:'Gerar pacote de resposta'},
 };
 
 // ================= state =================
@@ -152,14 +160,16 @@ const LS = {get:(k,d)=>{try{return JSON.parse(localStorage.getItem('rc_'+k))??d}
 const state = {
   lang: LS.get('lang','en'),
   juris: new Set(LS.get('juris',['iso22301','hkma','apra'])),
-  modelStatus:'idle', progress:0, modelTag:null, modelError:null,
-  screen:'setup', tab:'assistant',
+  modelStatus:'idle', modelTag:null, modelError:null,
+  view:'sim', advTab:'assistant',
+  sim:{phase:'intro', convo:[], log:[], turns:0, busy:false, report:'', reportBusy:false, seeding:false, seedMsg:''},
   pillar:0, messages:[], convo:[], assessments:{}, busy:false, complete:false,
-  incidentText:'', likelihood:2, control:2, scan:null, scanError:null,
-  tolerances: LS.get('tol', SEED_TOL.map(x=>({...x}))), vendors: LS.get('ven', SEED_VEN.map(v=>({...v, nth:[...v.nth]}))),
+  incidentText:'', likelihood:2, control:2, scan:null, scanError:null, pack:null, packBusy:false,
+  tolerances: LS.get('tol', SEED_TOL.map(x=>({...x}))), vendors: LS.get('ven', SEED_VEN.map(v=>({...v,nth:[...v.nth]}))),
   modal:null,
 };
 state.juris.add('iso22301');
+const sim=state.sim;
 function S(){return STR[state.lang]}
 
 // ================= helpers =================
@@ -168,290 +178,326 @@ const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 const matColor = m => m>=4?'var(--good)':m===3?'var(--primary)':m===2?'var(--warn)':'var(--danger)';
 const bandColor = s => s>=67?'var(--good)':s>=34?'var(--warn)':'var(--danger)';
 function activeJuris(){return JURIS.filter(j=>j.always||state.juris.has(j.id))}
+function persist(){LS.set('lang',state.lang);LS.set('juris',[...state.juris]);LS.set('tol',state.tolerances);LS.set('ven',state.vendors)}
 
-// ================= scoring + concentration (deterministic, on-device) =================
+// ================= scoring + concentration =================
 function sevWeight(s){return s==='low'?1:s==='high'?3:2}
-function computeScore(sev,lik,ctrl){
-  const s=sevWeight(sev),l=Math.min(3,Math.max(1,lik)),c=Math.min(4,Math.max(1,ctrl));
-  const inh=(s*l-1)/8, cf=(c-1)/3, res=inh*(1-cf);
-  return Math.max(0,Math.min(100,Math.round(100*(1-res))));
-}
-function concentrationRisks(){
-  const by={};
-  state.vendors.forEach(v=>{
-    const seen=new Set();
-    (v.nth||[]).forEach(p=>{const k=p.trim().toLowerCase();if(!k||seen.has(k))return;seen.add(k);
-      if(!by[k])by[k]={display:p.trim(),vendors:[]}; if(!by[k].vendors.includes(v.vendor))by[k].vendors.push(v.vendor);});
-  });
-  return Object.values(by).filter(a=>a.vendors.length>=2).sort((a,b)=>b.vendors.length-a.vendors.length);
-}
+function computeScore(sev,lik,ctrl){const s=sevWeight(sev),l=Math.min(3,Math.max(1,lik)),c=Math.min(4,Math.max(1,ctrl));
+  const inh=(s*l-1)/8, cf=(c-1)/3, res=inh*(1-cf); return Math.max(0,Math.min(100,Math.round(100*(1-res))));}
+function concentrationRisks(){const by={};
+  state.vendors.forEach(v=>{const seen=new Set();(v.nth||[]).forEach(p=>{const k=(''+p).trim().toLowerCase();if(!k||seen.has(k))return;seen.add(k);
+    if(!by[k])by[k]={display:(''+p).trim(),vendors:[]};if(!by[k].vendors.includes(v.vendor))by[k].vendors.push(v.vendor);});});
+  return Object.values(by).filter(a=>a.vendors.length>=2).sort((a,b)=>b.vendors.length-a.vendors.length);}
 
-// ================= real Gemma via local Ollama (through same-origin proxy) =================
-function gemmaVer(name){const m=name.match(/gemma\s*([0-9]+)/i); return m?parseInt(m[1],10):0;}
+// ================= Gemma via local Ollama =================
+function gemmaVer(n){const m=n.match(/gemma\s*([0-9]+)/i);return m?parseInt(m[1],10):0;}
 async function detectModel(){
-  const r=await fetch('/api/tags',{cache:'no-store'});
-  if(!r.ok) throw new Error('Ollama not reachable (HTTP '+r.status+')');
-  const j=await r.json();
-  const names=(j.models||[]).map(m=>m.name);
-  // Prefer the newest Gemma generation present (gemma4 > gemma3 > …).
-  const gemmas=names.filter(n=>/gemma/i.test(n)).sort((a,b)=>gemmaVer(b)-gemmaVer(a));
-  const tag = gemmas[0] || names[0];
-  if(!tag) throw new Error('No model in Ollama. Run:  ollama pull gemma4:12b');
-  return tag;
+  const r=await fetch('/api/tags',{cache:'no-store'}); if(!r.ok)throw new Error('Ollama not reachable (HTTP '+r.status+')');
+  const names=((await r.json()).models||[]).map(m=>m.name);
+  const g=names.filter(n=>/gemma/i.test(n)).sort((a,b)=>gemmaVer(b)-gemmaVer(a));
+  const tag=g[0]||names[0]; if(!tag)throw new Error('No model in Ollama. Run:  ollama pull gemma3:4b'); return tag;
 }
 async function ollamaChat(messages,{json=false,temperature=0.6,onToken}={}){
-  const body={model:state.modelTag,messages,stream:true,options:{temperature}};
-  if(json) body.format='json';
+  const body={model:state.modelTag,messages,stream:true,options:{temperature}}; if(json)body.format='json';
   const resp=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
-  if(!resp.ok) throw new Error('Gemma call failed (HTTP '+resp.status+')');
-  const reader=resp.body.getReader(); const dec=new TextDecoder(); let buf='',full='';
-  while(true){
-    const {done,value}=await reader.read(); if(done)break;
-    buf+=dec.decode(value,{stream:true}); let i;
-    while((i=buf.indexOf('\n'))>=0){
-      const line=buf.slice(0,i).trim(); buf=buf.slice(i+1); if(!line)continue;
-      let o; try{o=JSON.parse(line)}catch(e){continue}
-      if(o.error) throw new Error(o.error);
-      const t=o.message&&o.message.content||''; if(t){full+=t; onToken&&onToken(t,full);}
-    }
-  }
+  if(!resp.ok)throw new Error('Gemma call failed (HTTP '+resp.status+')');
+  const reader=resp.body.getReader(),dec=new TextDecoder(); let buf='',full='';
+  while(true){const {done,value}=await reader.read(); if(done)break; buf+=dec.decode(value,{stream:true}); let i;
+    while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim(); buf=buf.slice(i+1); if(!line)continue;
+      let o; try{o=JSON.parse(line)}catch(e){continue} if(o.error)throw new Error(o.error);
+      const t=o.message&&o.message.content||''; if(t){full+=t; onToken&&onToken(t,full);}}}
   return full;
 }
+function fileToB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res((''+r.result).split(',')[1]||'');r.onerror=rej;r.readAsDataURL(file);});}
 
-// ================= prompts (ported from prompt_builder.dart) =================
+// ================= prompts + parsing (Advisor) =================
 function replyLang(){return REPLY[state.lang]||'English'}
-function jurisdictionBlock(){
-  return activeJuris().map(j=>{
-    const style=j.clause?'cite exact clause numbers':'principles-based — cite the named section/principle, not a clause number';
-    return '- '+j.name+' ('+j.region+'): '+j.ref+' — '+style;
-  }).join('\n');
-}
+function jurisdictionBlock(){return activeJuris().map(j=>'- '+j.name+' ('+j.region+'): '+j.ref+(j.clause?' — cite exact clause numbers':' — principles-based, cite the named section, not a clause number')).join('\n');}
 function groundingFor(pillar){
   if(pillar.id==='tolerance'&&state.tolerances.length){
-    const lines=state.tolerances.map(t=>{
-      const o=[t.rto&&'RTO '+t.rto,t.rpo&&'RPO '+t.rpo,t.mtpd&&'MTPD '+t.mtpd,t.srto&&'SRTO '+t.srto].filter(Boolean).join(', ');
-      return '- '+t.service+': '+(o||'(no objectives set)');});
-    return '\n\nThe practitioner has already entered these impact tolerances in the Tools panel — use them directly:\n'+lines.join('\n');
-  }
+    const l=state.tolerances.map(t=>'- '+t.service+': '+([t.rto&&'RTO '+t.rto,t.rpo&&'RPO '+t.rpo,t.mtpd&&'MTPD '+t.mtpd,t.srto&&'SRTO '+t.srto].filter(Boolean).join(', ')||'(no objectives set)'));
+    return '\n\nThe practitioner has entered these impact tolerances — use them directly:\n'+l.join('\n');}
   if(pillar.id==='third-party'&&state.vendors.length){
-    const lines=state.vendors.map(v=>'- '+v.vendor+(v.service?' ('+v.service+')':'')+': '+((v.nth&&v.nth.length)?v.nth.join(', '):'(none listed)'));
-    const risks=concentrationRisks();
-    const rk=risks.length?'\nConcentration risks (shared Nth-parties): '+risks.map(r=>r.display+' (shared by '+r.vendors.join(', ')+')').join('; '):'';
-    return '\n\nThe practitioner has mapped these vendors/Nth-parties in the Tools panel — use them directly:\n'+lines.join('\n')+rk;
-  }
+    const l=state.vendors.map(v=>'- '+v.vendor+(v.service?' ('+v.service+')':'')+': '+((v.nth&&v.nth.length)?v.nth.join(', '):'(none)'));
+    const r=concentrationRisks(); const rk=r.length?'\nConcentration risks: '+r.map(x=>x.display+' (shared by '+x.vendors.join(', ')+')').join('; '):'';
+    return '\n\nThe practitioner has mapped these vendors/Nth-parties — use them directly:\n'+l.join('\n')+rk;}
   return '';
 }
-function bcmSystemPrompt(pillar){
-  const lang=replyLang();
-  return `You are Resilience Compass, an expert operational-resilience and business-continuity (BCM) advisor for banks. You help a practitioner self-assess their organisation against regulatory expectations.
-
-ALWAYS reply in ${lang}. Be concise.
-
-The practitioner selected these regulatory frameworks. When you evaluate an answer, cite the specific, relevant framework by name and section:
+function bcmSystemPrompt(pillar){const lang=replyLang();
+  return `You are Resilience Compass, an expert operational-resilience/BCM advisor for banks. ALWAYS reply in ${lang}. Be concise.
+The practitioner selected these frameworks; cite the relevant one by name and section:
 ${jurisdictionBlock()}
-
-Citation rules:
-- ISO 22301 is clause-numbered — cite exact clause numbers (e.g. "ISO 22301 clause 8.4.2").
-- HKMA, MAS, APRA, RBI and the US interagency guidance are principles-based — cite the named section/theme, never an invented clause number.
-- Never fabricate a citation.
-
-You are currently assessing this pillar:
+Rules: ISO 22301 is clause-numbered (cite exact clauses); the others are principles-based (cite the named section, never invent a clause number). Never fabricate a citation.
+You are assessing this pillar:
 "${pillar.title}" — ${pillar.prompt}${groundingFor(pillar)}
-
-Maturity scale: 1 = Not started/ad hoc, 2 = Partially defined, 3 = Established & documented, 4 = Advanced/continuously improved.
-
-How to respond:
-- If the practitioner DESCRIBES their current practice: give a concise evaluation (<= 110 words) grounded in the selected frameworks, name the main gap, and cite by name. Then, on a NEW final line, append exactly one tag — valid JSON only, no angle brackets or placeholders — for example:
+Maturity scale: 1 Not started, 2 Partially defined, 3 Established & documented, 4 Advanced.
+- If the practitioner DESCRIBES their practice: give a concise evaluation (<=110 words), name the main gap, cite by name. Then on a NEW final line append exactly one tag — valid JSON only, no angle brackets — for example:
 [[ASSESSMENT]] {"maturity": 2, "citations": ["ISO 22301 clause 8.4.2", "APRA CPS 230 (Recovery objectives)"], "rationale": "Recovery objectives exist but are not board-approved."}
 Set "maturity" to your actual integer score from 1 to 4.
-- If the practitioner ASKS A QUESTION instead: answer it helpfully and concisely, and DO NOT append the [[ASSESSMENT]] tag.
-
-This is a self-assessment aid, not legal advice or a certification audit. Never claim it guarantees compliance.`;
-}
-function incidentSystemPrompt(){
-  const lang=replyLang(); const cats=CATEGORIES.join(', ');
-  return `You are Resilience Compass, an operational-resilience incident classifier for banks. Classify the incident the user provides into EXACTLY ONE category from this list: ${cats}.
-Return ONLY a single valid JSON object and nothing else:
-{"category": "<one of: ${cats}>", "severity": "low|medium|high", "impactArea": "<short phrase in ${lang}>", "rationale": "<one short sentence in ${lang}>"}`;
-}
-
-// ================= output parsing (ported from json_extractor.dart) =================
+- If the practitioner ASKS A QUESTION: answer concisely and DO NOT append the tag.
+This is a self-assessment aid, not legal advice.`;}
+function incidentSystemPrompt(){const lang=replyLang(),cats=CATEGORIES.join(', ');
+  return `You are Resilience Compass, an incident classifier for banks. Classify the incident into EXACTLY ONE category from: ${cats}.
+Return ONLY a JSON object: {"category":"<one of: ${cats}>","severity":"low|medium|high","impactArea":"<short phrase in ${lang}>","rationale":"<one short sentence in ${lang}>"}`;}
 const ASSESS='[[ASSESSMENT]]';
-function firstJsonObject(s){
-  const start=s.indexOf('{'); if(start<0)return null;
-  let depth=0,inStr=false,esc2=false;
-  for(let i=start;i<s.length;i++){const ch=s[i];
-    if(inStr){ if(esc2){esc2=false;} else if(ch==='\\'){esc2=true;} else if(ch==='"'){inStr=false;} continue; }
-    if(ch==='"'){inStr=true;} else if(ch==='{'){depth++;} else if(ch==='}'){depth--; if(depth===0)return s.slice(start,i+1);}
-  }
-  return null;
-}
-function displayText(raw){const i=raw.indexOf(ASSESS); return (i>=0?raw.slice(0,i):raw).trim();}
-function extractAssessment(raw){
-  const i=raw.indexOf(ASSESS); if(i<0)return null;
-  const tail=raw.slice(i+ASSESS.length);
-  let m=null; const obj=firstJsonObject(tail);
-  if(obj){ try{m=JSON.parse(obj)}catch(e){} }
-  if(!m){ // tolerant fallback for slightly-malformed JSON (e.g. a stray "maturity": 2>)
-    const mm=tail.match(/"maturity"\s*:\s*(\d)/); if(!mm)return null;
-    const rr=tail.match(/"rationale"\s*:\s*"([^"]*)"/);
-    const cc=tail.match(/"citations"\s*:\s*\[([^\]]*)\]/);
-    m={maturity:parseInt(mm[1],10), rationale:rr?rr[1]:'',
-       citations:cc?(cc[1].match(/"([^"]*)"/g)||[]).map(x=>x.replace(/"/g,'')):[]};
-  }
-  let mat=m.maturity; if(typeof mat==='string')mat=parseInt(mat,10);
-  mat=(typeof mat==='number'&&!isNaN(mat))?Math.max(1,Math.min(4,Math.round(mat))):null;
+function firstJsonObject(s){const st=s.indexOf('{'); if(st<0)return null; let d=0,ins=false,esc2=false;
+  for(let i=st;i<s.length;i++){const ch=s[i];
+    if(ins){if(esc2){esc2=false;}else if(ch==='\\'){esc2=true;}else if(ch==='"'){ins=false;}continue;}
+    if(ch==='"'){ins=true;}else if(ch==='{'){d++;}else if(ch==='}'){d--;if(d===0)return s.slice(st,i+1);}}
+  return null;}
+function displayText(raw){const i=raw.indexOf(ASSESS);return (i>=0?raw.slice(0,i):raw).trim();}
+function extractAssessment(raw){const i=raw.indexOf(ASSESS); if(i<0)return null; const tail=raw.slice(i+ASSESS.length);
+  let m=null; const obj=firstJsonObject(tail); if(obj){try{m=JSON.parse(obj)}catch(e){}}
+  if(!m){const mm=tail.match(/"maturity"\s*:\s*(\d)/); if(!mm)return null;
+    const rr=tail.match(/"rationale"\s*:\s*"([^"]*)"/), cc=tail.match(/"citations"\s*:\s*\[([^\]]*)\]/);
+    m={maturity:parseInt(mm[1],10),rationale:rr?rr[1]:'',citations:cc?(cc[1].match(/"([^"]*)"/g)||[]).map(x=>x.replace(/"/g,'')):[]};}
+  let mat=m.maturity; if(typeof mat==='string')mat=parseInt(mat,10); mat=(typeof mat==='number'&&!isNaN(mat))?Math.max(1,Math.min(4,Math.round(mat))):null;
   const cites=Array.isArray(m.citations)?m.citations.map(x=>(''+x).trim()).filter(Boolean):[];
-  return {maturity:mat,citations:cites,rationale:(m.rationale||'').toString()};
-}
-function extractIncident(raw){
-  const obj=firstJsonObject(raw); if(!obj)return null;
-  let m; try{m=JSON.parse(obj)}catch(e){return null}
+  return {maturity:mat,citations:cites,rationale:(m.rationale||'').toString()};}
+function extractIncident(raw){const obj=firstJsonObject(raw); if(!obj)return null; let m; try{m=JSON.parse(obj)}catch(e){return null}
   let cat=(m.category||'').toString().trim().toLowerCase();
-  if(!CATEGORIES.includes(cat)){
-    cat = CATEGORIES.find(c=>cat.includes(c)||c.includes(cat))
-      || (/(vendor|supplier|party)/.test(cat)?'third-party':/(tech|system|it)/.test(cat)?'technology':'process');
-  }
-  let sev=(m.severity||'').toString().trim().toLowerCase(); if(sev==='moderate')sev='medium';
-  if(!['low','medium','high'].includes(sev))sev='medium';
-  return {category:cat,severity:sev,impactArea:(m.impactArea||m.impact_area||'').toString().trim(),rationale:(m.rationale||'').toString().trim()};
+  if(!CATEGORIES.includes(cat))cat=CATEGORIES.find(c=>cat.includes(c)||c.includes(cat))||(/(vendor|supplier|party)/.test(cat)?'third-party':/(tech|system|it)/.test(cat)?'technology':'process');
+  let sev=(m.severity||'').toString().trim().toLowerCase(); if(sev==='moderate')sev='medium'; if(!['low','medium','high'].includes(sev))sev='medium';
+  return {category:cat,severity:sev,impactArea:(m.impactArea||m.impact_area||'').toString().trim(),rationale:(m.rationale||'').toString().trim()};}
+
+// ================= Crisis Simulator (HERO) =================
+function bankProfileText(){
+  const svcs=state.tolerances.map(t=>t.service).filter(Boolean);
+  const vends=state.vendors.map(v=>v.vendor+(v.service?' ('+v.service+')':'')+' → '+((v.nth&&v.nth.length)?v.nth.join(', '):'—'));
+  const risks=concentrationRisks().map(r=>r.display+' (shared by '+r.vendors.join(', ')+')');
+  let s='This bank:\n';
+  if(svcs.length)s+='- Critical services: '+svcs.join('; ')+'\n';
+  if(vends.length)s+='- Vendors → Nth-party: '+vends.join(' | ')+'\n';
+  if(risks.length)s+='- KNOWN CONCENTRATION RISK (exploit this): '+risks.join('; ')+'\n';
+  return s.trim();
+}
+function simSystemPrompt(){const lang=replyLang();
+  return `You are the facilitator of a LIVE operational-resilience crisis tabletop exercise for a bank's executive team. Reply in ${lang}. Keep every message tight (<=110 words). Stay in character as the facilitator. Refer to the organisation as "the bank" — never use placeholders like [Bank Name].
+
+${bankProfileText()}
+
+Selected regulators: ${activeJuris().map(j=>j.name).join(', ')}.
+
+Run it turn by turn:
+- YOUR FIRST message: invent ONE severe-but-plausible disruption that exploits the concentration risk above. Use this exact shape:
+SCENARIO: <short title>
+SITUATION: <2-3 lines>
+INJECT [T+0]: <the event unfolding now>
+QUESTION: <one direct decision question to the participant>
+- AFTER each participant decision: in 2-3 sentences assess it against the named regulators (say which), then escalate with the NEXT timed inject and a new QUESTION. Use "INJECT [T+NNm]:" and "QUESTION:" labels. Raise the stakes realistically each turn.
+- Be specific to this bank's services and vendors. Do NOT produce a final report unless explicitly asked.`;}
+function reportRequest(){const lang=replyLang();
+  return `The exercise is over. Produce a concise AFTER-ACTION BOARD REPORT in ${lang} using these exact markdown headers and nothing before the first header:
+## Scenario
+## What happened
+## Decisions & assessment
+## Gaps vs regulators
+(cite ${activeJuris().map(j=>j.name).join(', ')} by name; ISO 22301 by clause)
+## Prioritised remediation
+(label each action P1, P2 or P3)
+## Overall resilience rating
+(a single score out of 100 with a one-line justification)
+Be specific to the decisions made in this exercise. Under 320 words.`;}
+function fmtFacilitator(raw){return esc(raw)
+  .replace(/^(SCENARIO:|SITUATION:|QUESTION:)/gmi,'<span class="faclabel">$1</span>')
+  .replace(/^(INJECT[^:\n]*:)/gmi,'<span class="injectlabel">$1</span>')
+  .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');}
+function fmtReport(raw){return esc(raw)
+  .replace(/^\s*##\s*(.+)$/gm,'@@H@@$1@@/H@@')
+  .replace(/^\s*[\*\-]\s+/gm,'• ')
+  .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+  .replace(/\n/g,'<br>')
+  .replace(/@@H@@/g,'<h3>').replace(/@@\/H@@/g,'</h3>');}
+function simScroll(){const c=document.getElementById('simlog'); if(c)c.scrollTop=c.scrollHeight;}
+
+async function startSim(){
+  if(state.modelStatus!=='ready'||sim.busy)return;
+  sim.phase='running'; sim.convo=[{role:'system',content:simSystemPrompt()}]; sim.log=[]; sim.turns=0; sim.report=''; render();
+  await simTurn('Begin the exercise.', false);
+}
+async function simTurn(userContent, display){
+  sim.convo.push({role:'user',content:userContent});
+  if(display) sim.log.push({role:'dec',text:userContent});
+  const entry={role:'fac',text:'',streaming:true}; sim.log.push(entry);
+  sim.busy=true; render(); simScroll();
+  const idx=sim.log.length-1; let raw='';
+  try{ raw=await ollamaChat(sim.convo,{temperature:0.85,onToken:(t,full)=>{const n=document.getElementById('log-'+idx); if(n)n.innerHTML=fmtFacilitator(full)+'<span class="cursor"></span>'; simScroll();}});
+    sim.convo.push({role:'assistant',content:raw}); entry.text=raw;
+  }catch(e){ entry.text='⚠️ '+e.message; }
+  entry.streaming=false; sim.busy=false; render(); simScroll();
+}
+function submitDecision(){const ta=document.getElementById('decision'); if(!ta)return; const t=ta.value.trim(); if(!t||sim.busy)return; ta.value=''; sim.turns++; simTurn(t,true);}
+async function endSim(){
+  if(sim.busy)return; sim.phase='report'; sim.report=''; sim.reportBusy=true; render();
+  try{ sim.report=await ollamaChat([...sim.convo,{role:'user',content:reportRequest()}],{temperature:0.4,onToken:(t,full)=>{const n=document.getElementById('reportbody'); if(n)n.innerHTML=fmtReport(full);}});
+  }catch(e){ sim.report='⚠️ '+e.message; }
+  sim.reportBusy=false; render();
+}
+function restartSim(){ sim.phase='intro'; sim.log=[]; sim.convo=[]; sim.turns=0; sim.report=''; render(); }
+async function seedFromImage(file){
+  if(!file||state.modelStatus!=='ready'){return;}
+  sim.seeding=true; sim.seedMsg='Reading your diagram with Gemma (on-device vision)…'; render();
+  try{
+    const b64=await fileToB64(file);
+    const raw=await ollamaChat([{role:'user',content:'This is a bank IT architecture or vendor diagram. Extract JSON only: {"vendors":[{"vendor":"name","service":"what it provides","nth":["cloud or sub-providers shown"]}]}. Include any shared cloud provider as an nth entry.',images:[b64]}],{json:true,temperature:0.2});
+    const obj=firstJsonObject(raw); const parsed=obj?JSON.parse(obj):null;
+    const vs=(parsed&&Array.isArray(parsed.vendors))?parsed.vendors.filter(v=>v&&v.vendor):[];
+    if(vs.length){ state.vendors=vs.map(v=>({vendor:(''+v.vendor).slice(0,40),service:(''+(v.service||'')).slice(0,60),nth:Array.isArray(v.nth)?v.nth.map(x=>(''+x).slice(0,40)):[]})); persist();
+      const rk=concentrationRisks(); sim.seedMsg='Imported '+vs.length+' vendors'+(rk.length?' — concentration risk on '+rk[0].display+'.':'.'); }
+    else sim.seedMsg='No vendors detected in the image — keeping the sample bank.';
+  }catch(e){ sim.seedMsg='Could not read the image ('+e.message+').'; }
+  sim.seeding=false; render();
+}
+
+// ================= Incident response pack (stub) =================
+async function genPack(){
+  const ta=document.getElementById('inc'); if(ta)state.incidentText=ta.value;
+  if(!state.incidentText.trim()||state.packBusy)return;
+  state.packBusy=true; state.pack=null; render();
+  try{ const sys='You are a bank incident-response assistant. Reply in '+replyLang()+'. For the incident, produce a concise response pack with these exact markdown headers: ## Likely root cause  ## Regulators to notify  (name them + a 2-line draft notice)  ## Customer message  (1-2 lines)  ## Top 3 remediation actions. Under 220 words.';
+    state.pack=await ollamaChat([{role:'system',content:sys},{role:'user',content:state.incidentText}],{temperature:0.4});
+  }catch(e){ state.pack='⚠️ '+e.message; }
+  state.packBusy=false; render();
 }
 
 // ================= views =================
-function render(){
-  if(state.screen==='setup') el.innerHTML=viewSetup();
-  else el.innerHTML=viewHome();
-  if(state.modal) el.insertAdjacentHTML('beforeend',state.modal);
-  bind();
-}
-function viewSetup(){
-  const s=S();
-  const langChips=Object.entries(LANGS).map(([k,v])=>`<div class="chip ${state.lang===k?'sel':''}" data-lang="${k}">${v}</div>`).join('');
-  const jur=JURIS.map(j=>{const on=j.always||state.juris.has(j.id);
-    return `<div class="card"><div class="checkrow" data-jur="${j.id}">
-      <div class="cbox ${on?'on':''} ${j.always?'lock':''}">${on?'✓':''}</div>
-      <div style="flex:1"><div class="between"><b>${j.name} · ${j.region}</b>${j.always?`<span class="pill">${s.iso}</span>`:''}</div>
-        <div class="hint" style="margin:4px 0 0">${j.ref}</div></div></div></div>`}).join('');
-  let loadArea='';
-  if(state.modelStatus==='idle') loadArea=`<button class="btn" data-act="load">⚡ ${s.load}</button>`;
-  else if(state.modelStatus==='loading') loadArea=`<div class="label">${s.loading} ${Math.round(state.progress*100)}%</div><div class="progress"><i style="width:${state.progress*100}%"></i></div>`;
-  else if(state.modelStatus==='ready') loadArea=`<div class="row" style="color:var(--good);font-weight:600;margin-bottom:6px">✔ ${s.ready}</div><div class="hint">model: <span class="modeltag">${esc(state.modelTag)}</span></div><div style="height:8px"></div><button class="btn" data-act="start">${s.start}</button>`;
-  else loadArea=`<div style="color:var(--danger);margin-bottom:10px">${esc(state.modelError||'Could not reach Gemma.')}</div><button class="btn" data-act="load">↻ ${s.load}</button>`;
-  return `<div class="pad fadein">
-    <div class="between"><div><h1>Resilience Compass</h1><div class="sub" style="margin-top:4px">${s.sub}</div></div>
-      <span class="badge"><span class="dot"></span>${s.offline}</span></div>
-    <div style="height:24px"></div><h2>${s.setup}</h2><div style="height:16px"></div>
-    <div class="label">${s.language}</div><div class="wrap">${langChips}</div>
-    <div style="height:24px"></div><div class="label">${s.juris}</div><div class="hint">${s.jurishint}</div>${jur}
-    <div style="height:12px"></div>
-    <div class="card"><div class="row"><span>ℹ️</span><b>${s.disc}</b></div><div class="hint" style="margin-top:8px">${DISCLAIMER}</div></div>
-    <div style="height:20px"></div>${loadArea}</div>`;
-}
-function viewHome(){
-  const s=S();
-  const title=state.tab==='assistant'?s.aTitle:state.tab==='scanner'?s.sTitle:s.tabT;
+function render(){ el.innerHTML=viewShell(); if(state.modal)el.insertAdjacentHTML('beforeend',state.modal); bind(); }
+function viewShell(){ return header()+`<div class="body2">${state.view==='sim'?viewSim():viewAdvisor()}</div>`; }
+function header(){
+  const st=state.modelStatus;
+  const status=st==='ready'?`<span class="modeltag">${esc(state.modelTag||'')}</span>`
+    :st==='loading'?`<span class="sub" style="font-size:11px">warming…</span>`
+    :st==='error'?`<span style="color:var(--danger);font-size:11px" title="${esc(state.modelError||'')}">offline</span>`
+    :`<span class="sub" style="font-size:11px">connecting…</span>`;
   const langOpts=Object.entries(LANGS).map(([k,v])=>`<option value="${k}" ${state.lang===k?'selected':''}>${v}</option>`).join('');
-  const body=state.tab==='assistant'?viewAssistant():state.tab==='scanner'?viewScanner():viewTools();
-  return `<div style="display:flex;flex-direction:column;height:100%">
-    <div class="appbar"><div class="row"><b>${title}</b><span class="badge"><span class="dot"></span>${s.offline}</span></div>
-      <div class="icons"><span class="modeltag">${esc(state.modelTag||'')}</span>
-      <select id="langsel" style="width:auto;padding:6px 8px">${langOpts}</select>
-      <button class="iconbtn" data-act="about">ⓘ</button></div></div>
-    <div class="screen" style="flex:1">${body}</div>
-    <div class="tabbar">
-      <div class="tab ${state.tab==='assistant'?'sel':''}" data-tab="assistant"><span class="ic">💬</span>${s.tabA}</div>
-      <div class="tab ${state.tab==='scanner'?'sel':''}" data-tab="scanner"><span class="ic">🛰️</span>${s.tabS}</div>
-      <div class="tab ${state.tab==='tools'?'sel':''}" data-tab="tools"><span class="ic">🛠️</span>${s.tabT}</div>
-    </div></div>`;
+  return `<div class="appbar">
+    <div class="row"><b>Resilience Compass</b><span class="badge"><span class="dot"></span>${S().offline}</span></div>
+    <div class="icons">${status}<select id="langsel" style="width:auto;padding:5px 6px">${langOpts}</select>
+      <button class="iconbtn" data-act="toggleview" title="${state.view==='sim'?'Advisor tools':'Crisis simulator'}">${state.view==='sim'?'🧰':'🔴'}</button>
+      <button class="iconbtn" data-act="about">ⓘ</button></div></div>`;
 }
-function viewAssistant(){
-  const s=S(); const p=PILLARS[state.pillar];
-  if(state.complete){
-    const scored=Object.values(state.assessments).filter(a=>a.maturity);
+
+// ---- HERO ----
+function viewSim(){ return sim.phase==='report'?viewReport():sim.phase==='running'?viewRunning():viewIntro(); }
+function viewIntro(){
+  const ready=state.modelStatus==='ready';
+  const risks=concentrationRisks();
+  const svcs=state.tolerances.map(t=>t.service).filter(Boolean);
+  return `<div class="pad fadein"><div class="hero">
+    <div class="herobadge">● LIVE EXERCISE</div>
+    <h1 style="margin-top:12px">Crisis Simulator</h1>
+    <p class="sub" style="line-height:1.5;margin:8px 0 0">Gemma runs a severe‑but‑plausible disruption tailored to your bank — on this device, offline. You make the calls; it reacts, escalates, and grades you against the regulators, then writes the board report.</p>
+    <div class="card" style="margin-top:16px;background:var(--surfaceAlt)">
+      <div class="hint" style="margin:0">Exercising against</div>
+      <div style="margin-top:6px;font-size:13px">${svcs.length?esc(svcs.join(' · ')):'sample critical services'}</div>
+      ${risks.length?`<div class="concchip">⚠️ ${esc(risks[0].display)} — single point of failure across ${risks[0].vendors.length} vendors</div>`:''}
+    </div>
+    <div class="upload">
+      <label class="filebtn">📎 Seed from an architecture diagram<input type="file" id="seedimg" accept="image/*" style="display:none"></label>
+      <span class="hint" style="margin-left:8px">${sim.seeding?'…':esc(sim.seedMsg||'(optional — Gemma reads the image on-device)')}</span>
+    </div>
+    <div style="height:16px"></div>
+    <button class="btn danger" data-act="simstart" ${ready?'':'disabled'}>${ready?'▶  Start the exercise':'Connecting to Gemma…'}</button>
+  </div>
+  <div class="hint" style="text-align:center;margin-top:12px">Tip: tap 🧰 for the BCM Assistant, Incident Scanner & vendor Tools.</div></div>`;
+}
+function viewRunning(){
+  const logs=sim.log.map((m,i)=>{ if(m.role==='dec')return `<div class="dec">${esc(m.text)}</div>`;
+    return `<div class="fac" id="log-${i}">${m.text?fmtFacilitator(m.text):'<span class="cursor"></span>'}</div>`; }).join('');
+  return `<div style="display:flex;flex-direction:column;height:100%">
+    <div class="pad" style="padding:12px 16px 8px"><div class="between"><div class="herobadge">● INJECT ${sim.turns+ (sim.phase==='running'?0:0)}</div>
+      <button class="btn ghost sm" data-act="endsim" ${sim.turns<1||sim.busy?'style="opacity:.4"':''}>End &amp; report →</button></div></div>
+    <div class="simlog" id="simlog" style="flex:1;overflow-y:auto">${logs}</div>
+    <div class="pad" style="padding:10px 14px 12px">
+      <div class="row"><textarea id="decision" rows="1" placeholder="Your decision as the exec team…" ${sim.busy?'disabled':''}></textarea>
+        <button class="btn danger" style="width:auto" data-act="decide" ${sim.busy?'disabled':''}>➤</button></div></div>
+  </div>`;
+}
+function viewReport(){
+  return `<div class="pad fadein">
+    <div class="between"><h2>After-action report</h2><span class="badge"><span class="dot"></span>on-device</span></div>
+    <div class="hint" style="margin-top:4px">Generated by Gemma from your exercise decisions.</div>
+    <div style="height:12px"></div>
+    <div class="report" id="reportbody">${sim.report?fmtReport(sim.report):'<span class="cursor"></span> synthesising…'}</div>
+    <div style="height:14px"></div>
+    <div class="row"><button class="btn tonal sm" data-act="restartsim">↻ Run another</button>
+      <button class="btn ghost sm" onclick="window.print()">🖨 Print / save</button></div>
+  </div>`;
+}
+
+// ---- ADVISOR (secondary) ----
+function viewAdvisor(){ const s=S(),tab=state.advTab;
+  const body=tab==='assistant'?viewAssistant():tab==='scanner'?viewScanner():viewTools();
+  return `<div style="display:flex;flex-direction:column;height:100%">
+    <div class="subtabs">
+      <div class="stab ${tab==='assistant'?'sel':''}" data-adv="assistant">💬 ${s.tabA}</div>
+      <div class="stab ${tab==='scanner'?'sel':''}" data-adv="scanner">🛰️ ${s.tabS}</div>
+      <div class="stab ${tab==='tools'?'sel':''}" data-adv="tools">🛠️ ${s.tabT}</div>
+    </div>
+    <div style="flex:1;min-height:0;overflow-y:auto">${body}</div></div>`;
+}
+function viewAssistant(){ const s=S(),p=PILLARS[state.pillar];
+  if(state.complete){ const scored=Object.values(state.assessments).filter(a=>a.maturity);
     const overall=scored.length?Math.round(scored.reduce((x,a)=>x+a.maturity,0)/scored.length/4*100):0;
     const rows=PILLARS.map(pl=>{const a=state.assessments[pl.id];
       return `<div class="card between"><span style="font-size:14px">${pl.title}</span>${a&&a.maturity?`<span class="mbadge" style="margin:0;color:${matColor(a.maturity)};background:${matColor(a.maturity)}22;border:1px solid ${matColor(a.maturity)}80">${s.maturity} ${a.maturity}/4</span>`:'<span class="sub">—</span>'}</div>`}).join('');
     return `<div class="pad fadein" style="text-align:center"><h2 style="text-align:center">${s.done}</h2><div style="height:16px"></div>
-      ${gauge(overall,120)}<div class="sub" style="margin-top:8px">${s.overall}</div>
-      <div style="height:20px"></div><div style="text-align:left">${rows}</div></div>`;
-  }
-  const msgs=state.messages.map((m,i)=>{
-    if(m.role==='u') return `<div class="bubble u">${esc(m.text)}</div>`;
-    const a=m.assessment; let extra='';
-    if(a&&a.maturity){extra=`<div><span class="mbadge" style="color:${matColor(a.maturity)};background:${matColor(a.maturity)}22;border:1px solid ${matColor(a.maturity)}80">${s.maturity} ${a.maturity}/4</span></div>`+
-      `<div>${a.citations.map(c=>`<span class="cite">${esc(c)}</span>`).join('')}</div>`;}
-    return `<div class="bubble a" id="msg-${i}"><span class="bubble-text">${esc(m.text)}</span>${m.streaming?'<span class="cursor"></span>':''}${extra}</div>`;
-  }).join('');
+      ${gauge(overall,120)}<div class="sub" style="margin-top:8px">${s.overall}</div><div style="height:20px"></div><div style="text-align:left">${rows}</div></div>`;}
+  const msgs=state.messages.map((m,i)=>{ if(m.role==='u')return `<div class="bubble u">${esc(m.text)}</div>`;
+    const a=m.assessment; let extra=''; if(a&&a.maturity){extra=`<div><span class="mbadge" style="color:${matColor(a.maturity)};background:${matColor(a.maturity)}22;border:1px solid ${matColor(a.maturity)}80">${s.maturity} ${a.maturity}/4</span></div><div>${a.citations.map(c=>`<span class="cite">${esc(c)}</span>`).join('')}</div>`;}
+    return `<div class="bubble a" id="amsg-${i}"><span class="bubble-text">${esc(m.text)}</span>${m.streaming?'<span class="cursor"></span>':''}${extra}</div>`;}).join('');
   return `<div style="display:flex;flex-direction:column;height:100%">
-    <div class="pad" style="padding-bottom:8px"><div class="hint">${s.pillar} ${state.pillar+1} ${s.of} ${PILLARS.length} · ${p.title}</div>
-      <div class="progress"><i style="width:${(state.pillar+1)/PILLARS.length*100}%"></i></div></div>
-    <div class="chatcol" style="flex:1;overflow-y:auto" id="chat">${msgs}</div>
+    <div class="pad" style="padding:12px 16px 8px"><div class="hint">${s.pillar} ${state.pillar+1} ${s.of} ${PILLARS.length} · ${p.title}</div>
+      <div class="progress" style="height:6px;border-radius:999px;background:var(--surfaceAlt);overflow:hidden"><i style="display:block;height:100%;background:var(--primary);width:${(state.pillar+1)/PILLARS.length*100}%"></i></div></div>
+    <div class="chatcol" id="achat" style="flex:1;overflow-y:auto">${msgs}</div>
     <div class="pad" style="padding-top:8px">
       <div class="row"><textarea id="ans" rows="1" placeholder="${s.answer}" ${state.busy?'disabled':''}></textarea>
-        <button class="btn" style="width:auto" data-act="send" ${state.busy?'disabled':''}>➤</button></div>
-      <div class="between" style="margin-top:8px">
-        <button class="btn ghost sm" data-act="advance" ${state.busy?'disabled':''}>${s.skip}</button>
-        <button class="btn tonal sm" data-act="advance" ${state.busy?'disabled':''}>${state.pillar<PILLARS.length-1?s.next:s.done} →</button></div>
-    </div></div>`;
+        <button class="btn" style="width:auto" data-act="asend" ${state.busy?'disabled':''}>➤</button></div>
+      <div class="between" style="margin-top:8px"><button class="btn ghost sm" data-act="aadvance" ${state.busy?'disabled':''}>${s.skip}</button>
+        <button class="btn tonal sm" data-act="aadvance" ${state.busy?'disabled':''}>${state.pillar<PILLARS.length-1?s.next:s.done} →</button></div></div></div>`;
 }
-function viewScanner(){
-  const s=S(); let result='';
-  if(state.scanError) result=`<div style="color:var(--danger);margin-top:16px">${esc(state.scanError)}</div>`;
+function viewScanner(){ const s=S(); let result='';
+  if(state.scanError)result=`<div style="color:var(--danger);margin-top:16px">${esc(state.scanError)}</div>`;
   else if(state.scan){const c=state.scan.cls;const col=c.severity==='low'?'var(--good)':c.severity==='high'?'var(--danger)':'var(--warn)';
-    const catLabel=c.category.replace('-',' ').replace(/^./,x=>x.toUpperCase());
-    const sevLabel=c.severity==='low'?s.low:c.severity==='high'?s.high:s.med;
-    result=`<div class="card fadein" style="display:flex;gap:16px;margin-top:20px">
+    const catLabel=c.category.replace('-',' ').replace(/^./,x=>x.toUpperCase()); const sevLabel=c.severity==='low'?s.low:c.severity==='high'?s.high:s.med;
+    result=`<div class="card fadein" style="display:flex;gap:16px;margin-top:16px">
       <div style="text-align:center">${gauge(state.scan.score,96)}<div class="hint" style="margin-top:6px">${s.score}</div></div>
       <div style="flex:1"><div><span class="sub">${s.category}: </span><b>${catLabel}</b></div>
         <div style="margin-top:8px"><span class="sub">${s.severity}: </span><span class="tag" style="color:${col};background:${col}22;border:1px solid ${col}80">${sevLabel}</span></div>
-        <div style="margin-top:8px"><span class="sub">${s.impact}: </span><b>${esc(c.impactArea||'—')}</b></div>
-        ${c.rationale?`<div class="hint" style="margin-top:8px">${esc(c.rationale)}</div>`:''}</div></div>`;}
+        <div style="margin-top:8px"><span class="sub">${s.impact}: </span><b>${esc(c.impactArea||'—')}</b></div></div></div>`;}
   const seg=(name,opts)=>`<div class="seg">${opts.map(o=>`<div class="${state[name]==o.v?'sel':''}" data-seg="${name}" data-v="${o.v}">${o.l}</div>`).join('')}</div>`;
+  const pack=state.pack?`<div class="report fadein" style="margin-top:14px" id="packbody">${fmtReport(state.pack)}</div>`:'';
   return `<div class="pad fadein"><div class="sub">${s.sIntro}</div><div style="height:12px"></div>
-    <textarea id="inc" rows="4" placeholder="${s.incident}" ${state.busy?'disabled':''}>${esc(state.incidentText)}</textarea>
-    <div style="height:16px"></div><div class="label">${s.likelihood}</div>${seg('likelihood',[{v:1,l:s.low},{v:2,l:s.med},{v:3,l:s.high}])}
-    <div style="height:16px"></div><div class="label">${s.control}</div>${seg('control',[{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4'}])}
-    <div style="height:20px"></div><button class="btn" data-act="analyze" ${state.busy?'disabled':''}>${state.busy?'…':'🛰️ '+s.analyze}</button>
-    ${result}</div>`;
+    <textarea id="inc" rows="4" placeholder="${s.incident}" ${state.busy||state.packBusy?'disabled':''}>${esc(state.incidentText)}</textarea>
+    <div style="height:14px"></div><div class="label">${s.likelihood}</div>${seg('likelihood',[{v:1,l:s.low},{v:2,l:s.med},{v:3,l:s.high}])}
+    <div style="height:14px"></div><div class="label">${s.control}</div>${seg('control',[{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4'}])}
+    <div style="height:18px"></div>
+    <div class="row"><button class="btn" data-act="analyze" ${state.busy?'disabled':''}>${state.busy?'…':'🛰️ '+s.analyze}</button>
+      <button class="btn tonal sm" data-act="genpack" ${state.packBusy?'disabled':''} style="white-space:nowrap">${state.packBusy?'…':'📝 '+s.pack}</button></div>
+    ${result}${pack}</div>`;
 }
-function viewTools(){
-  const s=S();
-  const tol=state.tolerances.length? state.tolerances.map((t,i)=>{
-    const objs=[t.rto&&'RTO '+t.rto,t.rpo&&'RPO '+t.rpo,t.mtpd&&'MTPD '+t.mtpd,t.srto&&'SRTO '+t.srto].filter(Boolean);
-    return `<div class="card between"><div><b>${esc(t.service)}</b><div style="margin-top:8px">${objs.length?objs.map(o=>`<span class="tag" style="color:var(--primary);background:#3DD6C422;border:1px solid #3DD6C480">${esc(o)}</span>`).join(''):'<span class="sub">—</span>'}</div></div>
-      <button class="iconbtn" data-del="tol" data-i="${i}">🗑</button></div>`}).join('') : `<div class="empty">${s.emptyTol}</div>`;
-  const ven=state.vendors.length? state.vendors.map((v,i)=>`<div class="card between"><div><b>${esc(v.vendor)}</b>${v.service?`<div class="hint" style="margin:2px 0 0">${esc(v.service)}</div>`:''}
-      <div style="margin-top:8px">${(v.nth&&v.nth.length)?v.nth.map(p=>`<span class="tag" style="color:var(--accent);background:#6C8CFF22;border:1px solid #6C8CFF59">${esc(p)}</span>`).join(''):'<span class="sub">—</span>'}</div></div>
-      <button class="iconbtn" data-del="ven" data-i="${i}">🗑</button></div>`).join('') : `<div class="empty">${s.emptyVen}</div>`;
-  const risks=concentrationRisks(); const acc=risks.length?'var(--warn)':'var(--good)';
-  const riskBody=risks.length? risks.map(r=>`<div style="margin-bottom:10px"><div class="row"><span class="tag" style="color:var(--danger);background:#FF6B6B22;border:1px solid #FF6B6B80;margin:0">${esc(r.display)}</span>
-      <span style="color:var(--danger);font-weight:600;font-size:12px">shared by ${r.vendors.length} vendors</span></div>
-      <div class="hint" style="margin-top:4px">${r.vendors.map(esc).join(' · ')}</div></div>`).join('') : `<div class="sub">${s.noconc}</div>`;
-  return `<div class="pad fadein"><div class="sub" style="line-height:1.4">${s.toolsIntro}</div><div style="height:20px"></div>
-    <div class="sechead">⏱️ ${s.tolTitle}</div><div style="height:8px"></div>${tol}
-    <div style="text-align:right"><button class="btn ghost sm" data-act="addtol">+ ${s.add}</button></div>
-    <div class="divider"></div>
+function viewTools(){ const s=S();
+  const tol=state.tolerances.length? state.tolerances.map((t,i)=>{const objs=[t.rto&&'RTO '+t.rto,t.rpo&&'RPO '+t.rpo,t.mtpd&&'MTPD '+t.mtpd,t.srto&&'SRTO '+t.srto].filter(Boolean);
+    return `<div class="card between"><div><b>${esc(t.service)}</b><div style="margin-top:8px">${objs.length?objs.map(o=>`<span class="tag" style="color:var(--primary);background:#3DD6C422;border:1px solid #3DD6C480">${esc(o)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="tol" data-i="${i}">🗑</button></div>`}).join('') : `<div class="empty">${s.emptyTol}</div>`;
+  const ven=state.vendors.length? state.vendors.map((v,i)=>`<div class="card between"><div><b>${esc(v.vendor)}</b>${v.service?`<div class="hint" style="margin:2px 0 0">${esc(v.service)}</div>`:''}<div style="margin-top:8px">${(v.nth&&v.nth.length)?v.nth.map(p=>`<span class="tag" style="color:var(--accent);background:#6C8CFF22;border:1px solid #6C8CFF59">${esc(p)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="ven" data-i="${i}">🗑</button></div>`).join('') : `<div class="empty">${s.emptyVen}</div>`;
+  const risks=concentrationRisks(),acc=risks.length?'var(--warn)':'var(--good)';
+  const riskBody=risks.length? risks.map(r=>`<div style="margin-bottom:10px"><div class="row"><span class="tag" style="color:var(--danger);background:#FF6B6B22;border:1px solid #FF6B6B80;margin:0">${esc(r.display)}</span><span style="color:var(--danger);font-weight:600;font-size:12px">shared by ${r.vendors.length} vendors</span></div><div class="hint" style="margin-top:4px">${r.vendors.map(esc).join(' · ')}</div></div>`).join('') : `<div class="sub">${s.noconc}</div>`;
+  return `<div class="pad fadein"><div class="sechead">⏱️ ${s.tolTitle}</div><div style="height:8px"></div>${tol}
+    <div style="text-align:right"><button class="btn ghost sm" data-act="addtol">+ ${s.add}</button></div><div class="divider"></div>
     <div class="sechead">🔗 ${s.nthTitle}</div><div style="height:8px"></div>${ven}
-    <div style="text-align:right"><button class="btn ghost sm" data-act="addven">+ ${s.add}</button></div>
-    <div style="height:16px"></div>
-    <div class="card"><div class="row" style="color:${acc}"><span>${risks.length?'⚠️':'✅'}</span><b style="color:var(--text)">${s.conc}</b></div>
-      <div style="height:10px"></div>${riskBody}</div></div>`;
+    <div style="text-align:right"><button class="btn ghost sm" data-act="addven">+ ${s.add}</button></div><div style="height:16px"></div>
+    <div class="card"><div class="row" style="color:${acc}"><span>${risks.length?'⚠️':'✅'}</span><b style="color:var(--text)">${s.conc}</b></div><div style="height:10px"></div>${riskBody}</div></div>`;
 }
 function gauge(score,size){const col=bandColor(score);
-  return `<div class="gauge" style="width:${size}px;height:${size}px;background:conic-gradient(${col} ${score*3.6}deg, var(--surfaceAlt) 0)">
-    <div class="hole"></div><span style="color:${col};font-size:${size*0.3}px">${score}</span></div>`;}
+  return `<div class="gauge" style="width:${size}px;height:${size}px;background:conic-gradient(${col} ${score*3.6}deg, var(--surfaceAlt) 0)"><div class="hole"></div><span style="color:${col};font-size:${size*0.3}px">${score}</span></div>`;}
 
-// ================= modals =================
+// ---- modals ----
 function tolModal(){const s=S();return `<div class="modal"><div class="sheet fadein"><h2>${s.tolTitle}</h2><div style="height:12px"></div>
-  <div class="field"><small>${s.service}</small><input id="m_service"></div>
-  <div class="field"><small>RTO</small><input id="m_rto" placeholder="e.g. 4h"></div>
-  <div class="field"><small>RPO</small><input id="m_rpo" placeholder="e.g. 15m"></div>
-  <div class="field"><small>MTPD</small><input id="m_mtpd" placeholder="e.g. 24h"></div>
-  <div class="field"><small>SRTO</small><input id="m_srto"></div>
+  <div class="field"><small>${s.service}</small><input id="m_service"></div><div class="field"><small>RTO</small><input id="m_rto" placeholder="e.g. 4h"></div>
+  <div class="field"><small>RPO</small><input id="m_rpo" placeholder="e.g. 15m"></div><div class="field"><small>MTPD</small><input id="m_mtpd"></div><div class="field"><small>SRTO</small><input id="m_srto"></div>
   <div class="between" style="margin-top:8px"><button class="btn ghost sm" data-act="closemodal">Cancel</button><button class="btn sm" data-act="savetol">${s.add}</button></div></div></div>`}
 function venModal(){const s=S();return `<div class="modal"><div class="sheet fadein"><h2>${s.nthTitle}</h2><div style="height:12px"></div>
-  <div class="field"><small>${s.vendor}</small><input id="m_vendor"></div>
-  <div class="field"><small>${s.provided}</small><input id="m_prov"></div>
+  <div class="field"><small>${s.vendor}</small><input id="m_vendor"></div><div class="field"><small>${s.provided}</small><input id="m_prov"></div>
   <div class="field"><small>${s.nth}</small><input id="m_nth" placeholder="AWS, Cloudflare, ..."></div>
   <div class="between" style="margin-top:8px"><button class="btn ghost sm" data-act="closemodal">Cancel</button><button class="btn sm" data-act="saveven">${s.add}</button></div></div></div>`}
 function aboutModal(){const s=S();return `<div class="modal"><div class="sheet fadein"><span class="badge"><span class="dot"></span>${s.offline}</span>
@@ -460,96 +506,73 @@ function aboutModal(){const s=S();return `<div class="modal"><div class="sheet f
   <div class="card"><div class="row"><span>ℹ️</span><b>${s.disc}</b></div><div class="hint" style="margin-top:8px">${DISCLAIMER}</div></div>
   <div style="text-align:right;margin-top:8px"><button class="btn sm" data-act="closemodal">OK</button></div></div></div>`}
 
-// ================= behaviour =================
-function persist(){LS.set('lang',state.lang);LS.set('juris',[...state.juris]);LS.set('tol',state.tolerances);LS.set('ven',state.vendors)}
-function scrollChat(){const c=document.getElementById('chat');if(c)c.scrollTop=c.scrollHeight}
-
-async function loadModel(){
-  state.modelStatus='loading';state.progress=0.1;state.modelError=null;render();
-  try{
-    state.modelTag=await detectModel(); state.progress=0.5; render();
-    await ollamaChat([{role:'user',content:'Reply with the single word: ready'}],{temperature:0,onToken:()=>{}}); // warm
-    state.progress=1;state.modelStatus='ready';persist();render();
+// ================= advisor behaviour =================
+async function autoConnect(){
+  if(state.modelStatus==='ready'||state.modelStatus==='loading')return;
+  state.modelStatus='loading'; render();
+  try{ state.modelTag=await detectModel(); render();
+    await ollamaChat([{role:'user',content:'Reply with the single word: ready'}],{temperature:0,onToken:()=>{}});
+    state.modelStatus='ready'; persist(); render();
   }catch(e){ state.modelStatus='error'; state.modelError=e.message; render(); }
 }
-function start(){state.screen='home';state.tab='assistant';state.pillar=0;state.messages=[];state.convo=[];state.assessments={};state.complete=false;render();openPillar();}
-
-async function openPillar(){
-  if(state.busy)return;
-  const p=PILLARS[state.pillar];
+function aScroll(){const c=document.getElementById('achat'); if(c)c.scrollTop=c.scrollHeight;}
+async function openPillar(){ if(state.busy)return; const p=PILLARS[state.pillar];
   state.messages=[]; state.convo=[{role:'system',content:bcmSystemPrompt(p)}]; state.complete=false; render();
-  // real, localized opener (no score expected)
-  await runTurn('Briefly introduce this pillar in one short, friendly sentence, then ask me to describe our current practice. Do not include any tag.', {display:false, expectScore:false});
+  await aTurn('Briefly introduce this pillar in one short sentence, then ask me to describe our current practice. No tag.', false, false);
 }
-async function runTurn(userContent,{display,expectScore}){
-  if(state.busy && display) return;
-  if(display) state.messages.push({role:'u',text:userContent});
-  state.convo.push({role:'user',content:userContent});
-  const msg={role:'a',text:'',streaming:true,assessment:null};
-  state.messages.push(msg); state.busy=true; render(); scrollChat();
+async function aTurn(userContent, display, expectScore){ const chatEmpty=false;
+  if(display) state.messages.push({role:'u',text:userContent}); state.convo.push({role:'user',content:userContent});
+  const msg={role:'a',text:'',streaming:true,assessment:null}; state.messages.push(msg); state.busy=true; render(); aScroll();
   const idx=state.messages.length-1; let raw='';
-  try{
-    raw=await ollamaChat(state.convo,{temperature:expectScore?0.5:0.7,onToken:(t,full)=>{
-      const node=document.querySelector('#msg-'+idx+' .bubble-text'); if(node)node.textContent=displayText(full); scrollChat();
-    }});
+  try{ raw=await ollamaChat(state.convo,{temperature:expectScore?0.5:0.7,onToken:(t,full)=>{const n=document.querySelector('#amsg-'+idx+' .bubble-text'); if(n)n.textContent=displayText(full); aScroll();}});
     state.convo.push({role:'assistant',content:raw});
     if(expectScore){const a=extractAssessment(raw); if(a&&a.maturity){msg.assessment=a; state.assessments[PILLARS[state.pillar].id]=a;}}
     msg.text=displayText(raw)||raw.trim();
   }catch(e){ msg.text='⚠️ '+e.message; }
-  msg.streaming=false; state.busy=false; render(); scrollChat();
+  msg.streaming=false; state.busy=false; render(); aScroll();
 }
-function sendAnswer(){
-  const ta=document.getElementById('ans'); if(!ta)return; const txt=ta.value.trim();
-  if(!txt||state.busy)return; ta.value='';
-  runTurn(txt,{display:true,expectScore:true});
-}
-function advance(){if(state.busy)return; if(state.pillar<PILLARS.length-1){state.pillar++;render();openPillar();} else {state.complete=true;render();}}
-
-async function analyze(){
-  const ta=document.getElementById('inc'); state.incidentText=ta?ta.value:state.incidentText;
-  if(!state.incidentText.trim()||state.busy)return;
-  state.busy=true;state.scan=null;state.scanError=null;render();
-  try{
-    const raw=await ollamaChat([{role:'system',content:incidentSystemPrompt()},{role:'user',content:state.incidentText}],{json:true,temperature:0.2});
-    const cls=extractIncident(raw); if(!cls)throw new Error('Could not parse the classification. Try rephrasing the incident.');
+function aSend(){const ta=document.getElementById('ans'); if(!ta)return; const t=ta.value.trim(); if(!t||state.busy)return; ta.value=''; aTurn(t,true,true);}
+function aAdvance(){ if(state.busy)return; if(state.pillar<PILLARS.length-1){state.pillar++; render(); openPillar();} else {state.complete=true; render();}}
+async function analyze(){ const ta=document.getElementById('inc'); state.incidentText=ta?ta.value:state.incidentText;
+  if(!state.incidentText.trim()||state.busy)return; state.busy=true; state.scan=null; state.scanError=null; render();
+  try{ const raw=await ollamaChat([{role:'system',content:incidentSystemPrompt()},{role:'user',content:state.incidentText}],{json:true,temperature:0.2});
+    const cls=extractIncident(raw); if(!cls)throw new Error('Could not parse the classification.');
     state.scan={cls,score:computeScore(cls.severity,state.likelihood,state.control)};
-  }catch(e){ state.scanError=e.message; }
-  state.busy=false;render();
+  }catch(e){ state.scanError=e.message; } state.busy=false; render();
 }
 
+// ================= bind =================
 function bind(){
-  el.querySelectorAll('[data-lang]').forEach(n=>n.onclick=()=>{state.lang=n.dataset.lang;persist();render()});
-  el.querySelectorAll('[data-jur]').forEach(n=>n.onclick=()=>{const id=n.dataset.jur;const j=JURIS.find(x=>x.id===id);if(j.always)return;
-    state.juris.has(id)?state.juris.delete(id):state.juris.add(id);persist();render()});
-  const ls=document.getElementById('langsel'); if(ls)ls.onchange=()=>{state.lang=ls.value;persist();render();
-    if(state.screen==='home'&&state.tab==='assistant'&&!state.busy&&!state.complete)openPillar();};
-  el.querySelectorAll('[data-tab]').forEach(n=>n.onclick=()=>{state.tab=n.dataset.tab;render();
-    if(state.tab==='assistant'&&!state.messages.length&&!state.complete&&!state.busy)openPillar();});
-  el.querySelectorAll('[data-seg]').forEach(n=>n.onclick=()=>{state[n.dataset.seg]=+n.dataset.v;
-    const ta=document.getElementById('inc');if(ta)state.incidentText=ta.value;render()});
-  el.querySelectorAll('[data-del]').forEach(n=>n.onclick=()=>{const i=+n.dataset.i;
-    if(n.dataset.del==='tol')state.tolerances.splice(i,1);else state.vendors.splice(i,1);persist();render()});
+  const ls=document.getElementById('langsel'); if(ls)ls.onchange=()=>{state.lang=ls.value; persist(); render();};
+  const fi=document.getElementById('seedimg'); if(fi)fi.onchange=e=>{const f=e.target.files&&e.target.files[0]; if(f)seedFromImage(f);};
+  el.querySelectorAll('[data-adv]').forEach(n=>n.onclick=()=>{state.advTab=n.dataset.adv; render();
+    if(state.advTab==='assistant'&&!state.messages.length&&!state.complete&&!state.busy)openPillar();});
+  el.querySelectorAll('[data-seg]').forEach(n=>n.onclick=()=>{state[n.dataset.seg]=+n.dataset.v; const ta=document.getElementById('inc'); if(ta)state.incidentText=ta.value; render();});
+  el.querySelectorAll('[data-del]').forEach(n=>n.onclick=()=>{const i=+n.dataset.i; if(n.dataset.del==='tol')state.tolerances.splice(i,1); else state.vendors.splice(i,1); persist(); render();});
   el.querySelectorAll('[data-act]').forEach(n=>n.onclick=()=>act(n.dataset.act));
 }
-function act(a){
-  const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
+function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
   switch(a){
-    case'load':loadModel();break;
-    case'start':start();break;
-    case'about':state.modal=aboutModal();render();break;
-    case'closemodal':state.modal=null;render();break;
-    case'send':sendAnswer();break;
-    case'advance':advance();break;
-    case'analyze':analyze();break;
-    case'addtol':state.modal=tolModal();render();break;
-    case'addven':state.modal=venModal();render();break;
-    case'savetol':{const s=g('m_service');if(!s)return;state.tolerances.push({service:s,rto:g('m_rto'),rpo:g('m_rpo'),mtpd:g('m_mtpd'),srto:g('m_srto')});state.modal=null;persist();render();break;}
-    case'saveven':{const v=g('m_vendor');if(!v)return;const nth=g('m_nth').split(',').map(x=>x.trim()).filter(Boolean);
-      state.vendors.push({vendor:v,service:g('m_prov'),nth});state.modal=null;persist();render();break;}
+    case'toggleview': state.view=state.view==='sim'?'advisor':'sim'; render(); if(state.view==='advisor'&&state.advTab==='assistant'&&!state.messages.length&&!state.complete&&!state.busy)openPillar(); break;
+    case'about': state.modal=aboutModal(); render(); break;
+    case'closemodal': state.modal=null; render(); break;
+    case'simstart': startSim(); break;
+    case'decide': submitDecision(); break;
+    case'endsim': endSim(); break;
+    case'restartsim': restartSim(); break;
+    case'asend': aSend(); break;
+    case'aadvance': aAdvance(); break;
+    case'analyze': analyze(); break;
+    case'genpack': genPack(); break;
+    case'addtol': state.modal=tolModal(); render(); break;
+    case'addven': state.modal=venModal(); render(); break;
+    case'savetol':{const s=g('m_service'); if(!s)return; state.tolerances.push({service:s,rto:g('m_rto'),rpo:g('m_rpo'),mtpd:g('m_mtpd'),srto:g('m_srto')}); state.modal=null; persist(); render(); break;}
+    case'saveven':{const v=g('m_vendor'); if(!v)return; const nth=g('m_nth').split(',').map(x=>x.trim()).filter(Boolean); state.vendors.push({vendor:v,service:g('m_prov'),nth}); state.modal=null; persist(); render(); break;}
   }
 }
 
 render();
+autoConnect();
 </script>
 </body>
 </html>
