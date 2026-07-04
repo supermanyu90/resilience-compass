@@ -189,6 +189,16 @@ const SEED_VEN = [
 ];
 const LANGS = {en:'English',hi:'हिन्दी',zh:'简体中文',es:'Español',fr:'Français',pt:'Português'};
 const REPLY = {en:'English',hi:'Hindi (हिन्दी)',zh:'Simplified Chinese (简体中文)',es:'Spanish (Español)',fr:'French (Français)',pt:'Portuguese (Português)'};
+// Dr. Owl — language-specific persona (name + all fixed lines). His live tips already reply in-language.
+const OWL = {
+  en:{name:"Dr. Owl",poweredBy:"powered by Gemma",greet:"Hi, I'm Dr. Owl. Let's run a live crisis drill for your bank — I'll grade your calls against the regulators.",readingSituation:"Reading the situation…",yourMove:"Your move, team — what do you do?",reportReady:"Your board report is ready — solid work under pressure.",thinking:"Thinking…",tipAssistant:"Answer in the box below — or tap 💡 and I'll hint what a strong answer to this pillar looks like.",tipScanner:"Paste an incident and I'll classify it. Tap 💡 for the details that help most.",tipTools:"Map your vendors here — tap 💡 and I'll flag your biggest concentration risk.",error:"Hmm — I could not reach Gemma just now. Try 💡 again in a moment."},
+  hi:{name:"डॉ. उल्लू",poweredBy:"Gemma द्वारा संचालित",greet:"नमस्ते, मैं डॉ. उल्लू हूँ। आइए आपके बैंक के लिए एक लाइव संकट अभ्यास चलाएँ — मैं आपके निर्णयों को नियामकों के विरुद्ध आँकूँगा।",readingSituation:"स्थिति पढ़ रहा हूँ…",yourMove:"आपकी बारी — आप क्या करेंगे?",reportReady:"आपकी बोर्ड रिपोर्ट तैयार है — दबाव में बढ़िया काम।",thinking:"सोच रहा हूँ…",tipAssistant:"नीचे बॉक्स में उत्तर दें — या 💡 दबाएँ और मैं बताऊँगा कि इस स्तंभ का मजबूत उत्तर कैसा दिखता है।",tipScanner:"कोई घटना चिपकाएँ और मैं उसे वर्गीकृत करूँगा। सबसे उपयोगी विवरण के लिए 💡 दबाएँ।",tipTools:"यहाँ अपने विक्रेता मैप करें — 💡 दबाएँ और मैं आपका सबसे बड़ा संकेंद्रण जोखिम बताऊँगा।",error:"हम्म — अभी Gemma तक नहीं पहुँच सका। थोड़ी देर में फिर 💡 आज़माएँ।"},
+  zh:{name:"猫头鹰博士",poweredBy:"由 Gemma 驱动",greet:"你好，我是猫头鹰博士。让我们为你的银行进行一次实时危机演练——我会依据监管要求评估你的决策。",readingSituation:"正在研判形势…",yourMove:"轮到你了——你会怎么做？",reportReady:"你的董事会报告已就绪——压力之下表现出色。",thinking:"思考中…",tipAssistant:"在下方框中作答——或点击 💡，我会提示这一支柱的优秀答案是什么样的。",tipScanner:"粘贴一个事件，我会对其分类。点击 💡 了解哪些细节最有帮助。",tipTools:"在此映射你的供应商——点击 💡，我会指出你最大的集中度风险。",error:"嗯——暂时无法连接 Gemma。稍后再试 💡。"},
+  es:{name:"Dr. Búho",poweredBy:"con tecnología de Gemma",greet:"Hola, soy el Dr. Búho. Hagamos un simulacro de crisis en vivo para tu banco: evaluaré tus decisiones frente a los reguladores.",readingSituation:"Analizando la situación…",yourMove:"Te toca — ¿qué haces?",reportReady:"Tu informe para el consejo está listo — buen trabajo bajo presión.",thinking:"Pensando…",tipAssistant:"Responde en el cuadro de abajo — o pulsa 💡 y te sugeriré cómo es una buena respuesta a este pilar.",tipScanner:"Pega un incidente y lo clasificaré. Pulsa 💡 para saber qué detalles ayudan más.",tipTools:"Mapea tus proveedores aquí — pulsa 💡 y señalaré tu mayor riesgo de concentración.",error:"Mmm — no pude conectar con Gemma ahora. Prueba 💡 de nuevo en un momento."},
+  fr:{name:"Dr Hibou",poweredBy:"propulsé par Gemma",greet:"Bonjour, je suis le Dr Hibou. Lançons un exercice de crise en direct pour votre banque — j'évaluerai vos décisions au regard des régulateurs.",readingSituation:"J'analyse la situation…",yourMove:"À vous — que faites-vous ?",reportReady:"Votre rapport pour le conseil est prêt — beau travail sous pression.",thinking:"Je réfléchis…",tipAssistant:"Répondez dans le champ ci-dessous — ou touchez 💡 et je vous indiquerai à quoi ressemble une bonne réponse pour ce pilier.",tipScanner:"Collez un incident et je le classerai. Touchez 💡 pour les détails les plus utiles.",tipTools:"Cartographiez vos fournisseurs ici — touchez 💡 et je signalerai votre principal risque de concentration.",error:"Hmm — impossible de joindre Gemma pour l'instant. Réessayez 💡 dans un instant."},
+  pt:{name:"Dr. Coruja",poweredBy:"com tecnologia Gemma",greet:"Olá, sou o Dr. Coruja. Vamos fazer um exercício de crise ao vivo para o seu banco — vou avaliar as suas decisões perante os reguladores.",readingSituation:"Analisando a situação…",yourMove:"É a sua vez — o que você faz?",reportReady:"O seu relatório para o conselho está pronto — bom trabalho sob pressão.",thinking:"Pensando…",tipAssistant:"Responda na caixa abaixo — ou toque 💡 e eu sugiro como é uma boa resposta para este pilar.",tipScanner:"Cole um incidente e eu o classifico. Toque 💡 para os detalhes que mais ajudam.",tipTools:"Mapeie seus fornecedores aqui — toque 💡 e eu aponto seu maior risco de concentração.",error:"Hmm — não consegui alcançar o Gemma agora. Tente 💡 novamente em instantes."},
+};
+function owlT(){return OWL[state.lang]||OWL.en;}
 const STR = {
  en:{offline:'Offline · On-device',tabA:'Assistant',tabS:'Scanner',tabT:'Tools',answer:'Describe your current practice — or ask a question…',send:'Send',maturity:'Maturity',next:'Next pillar',skip:'Skip',done:'Assessment complete',overall:'Overall readiness',sIntro:'Paste or describe an operational incident. Gemma classifies it on-device and scores resilience.',incident:'Paste or describe the incident…',analyze:'Analyze',category:'Category',severity:'Severity',impact:'Impact area',score:'Resilience score',likelihood:'Likelihood',control:'Control maturity',low:'Low',med:'Medium',high:'High',privacy:'All processing happens on this device. Your inputs never leave your machine.',disc:'Compliance disclaimer',tolTitle:'Impact Tolerance Configurator',nthTitle:'Nth-Party Dependency Mapper',service:'Critical service',vendor:'Vendor',provided:'Service provided',nth:'Nth-party dependencies (comma-separated)',add:'Add',conc:'Concentration risk',noconc:'No shared Nth-party dependencies detected.',emptyTol:'No critical services configured yet.',emptyVen:'No vendors mapped yet.',pillar:'Pillar',of:'of',pack:'Generate response pack'},
  hi:{offline:'ऑफ़लाइन · डिवाइस पर',tabA:'सहायक',tabS:'स्कैनर',tabT:'उपकरण',answer:'अपनी वर्तमान प्रथा बताएं — या प्रश्न पूछें…',send:'भेजें',maturity:'परिपक्वता',next:'अगला स्तंभ',skip:'छोड़ें',done:'आकलन पूर्ण',overall:'समग्र तैयारी',sIntro:'किसी परिचालन घटना को चिपकाएँ। Gemma इसे डिवाइस पर वर्गीकृत करता है।',incident:'घटना चिपकाएँ या वर्णन करें…',analyze:'विश्लेषण करें',category:'श्रेणी',severity:'गंभीरता',impact:'प्रभाव क्षेत्र',score:'लचीलापन अंक',likelihood:'संभावना',control:'नियंत्रण परिपक्वता',low:'निम्न',med:'मध्यम',high:'उच्च',privacy:'सभी प्रसंस्करण इसी डिवाइस पर होता है।',disc:'अनुपालन अस्वीकरण',tolTitle:'प्रभाव सहनशीलता कॉन्फ़िगरेटर',nthTitle:'Nth-पक्ष निर्भरता मैपर',service:'महत्वपूर्ण सेवा',vendor:'विक्रेता',provided:'प्रदान की गई सेवा',nth:'Nth-पक्ष निर्भरताएँ (अल्पविराम से अलग)',add:'जोड़ें',conc:'संकेंद्रण जोखिम',noconc:'कोई साझा Nth-पक्ष निर्भरता नहीं मिली।',emptyTol:'अभी तक कोई सेवा कॉन्फ़िगर नहीं की गई।',emptyVen:'अभी तक कोई विक्रेता मैप नहीं किया गया।',pillar:'स्तंभ',of:'/',pack:'प्रतिक्रिया पैक बनाएं'},
@@ -378,23 +388,21 @@ function owlWidget(mood,line,compact){
   const cls='owl '+(mood||'idle')+(compact?' compact':'');
   const bubble=line?`<div class="owlbubble" id="owlbubble">${esc(line)}</div>`:'';
   const inner=compact?`<div class="owlchar">${owlSvg()}</div>${bubble}`
-    :`${bubble}<div class="owlchar">${owlSvg()}</div><div class="owlname">Dr. Owl · powered by Gemma</div>`;
+    :`${bubble}<div class="owlchar">${owlSvg()}</div><div class="owlname">${esc(owlT().name)} · ${esc(owlT().poweredBy)}</div>`;
   return `<div class="${cls}" id="owl">${inner}</div>`;
 }
 function fmtFacDisplay(raw){return fmtFacilitator(raw.replace(/^\s*QUESTION:.*$/gmi,'').trim());}
 function lastQuestion(){for(let i=sim.log.length-1;i>=0;i--){const m=sim.log[i]; if(m.role==='fac'&&m.text){const q=m.text.match(/QUESTION:\s*([^\n]+)/i); if(q)return q[1].trim();}}return '';}
-function owlLineForSim(){ if(sim.busy)return 'Reading the situation…'; const q=lastQuestion(); return q||'Your move, team — what do you do?'; }
+function owlLineForSim(){ if(sim.busy)return owlT().readingSituation; const q=lastQuestion(); return q||owlT().yourMove; }
 function gaugeCount(score){const col=bandColor(score);return `<div class="gauge" style="width:84px;height:84px;background:conic-gradient(${col} ${score*3.6}deg, var(--surfaceAlt) 0)"><div class="hole"></div><span style="color:${col};font-size:26px" data-countup="${score}">0</span></div>`;}
 
 // ---- Dr. Owl as a live helper on the Advisor tabs (uses real Gemma) ----
-function defaultTip(tab){return tab==='assistant'?'Answer in the box below — or tap 💡 and I\'ll hint what a strong answer to this pillar looks like.'
-  :tab==='scanner'?'Paste an incident and I\'ll classify it. Tap 💡 for the details that help most.'
-  :'Map your vendors here — tap 💡 and I\'ll flag your biggest concentration risk.';}
+function defaultTip(tab){const o=owlT();return tab==='assistant'?o.tipAssistant:tab==='scanner'?o.tipScanner:o.tipTools;}
 function helperOwl(tab){
   const t=state.owlTip, busy=t.busy;
-  const line=busy?'Thinking…':(t[tab]||defaultTip(tab));
+  const line=busy?owlT().thinking:(t[tab]||defaultTip(tab));
   const disabled=(busy||state.busy)?'disabled':'';
-  const btn=`<button class="iconbtn" data-act="owltip" title="Ask Dr. Owl (Gemma)" ${disabled}>${busy?'…':(t[tab]?'↻':'💡')}</button>`;
+  const btn=`<button class="iconbtn" data-act="owltip" title="${esc(owlT().name)} · Gemma" ${disabled}>${busy?'…':(t[tab]?'↻':'💡')}</button>`;
   return `<div class="owlhelper">${owlWidget(busy?'thinking':'idle', line, true)}${btn}</div>`;
 }
 async function fetchOwlTip(tab){
@@ -403,14 +411,14 @@ async function fetchOwlTip(tab){
   const ow=document.getElementById('owl'); if(ow)ow.classList.add('talking');
   const lang=replyLang(); let prompt;
   if(tab==='assistant'){const p=PILLARS[state.pillar];
-    prompt='You are Dr. Owl, a warm, concise operational-resilience coach for a bank. In 35 words or fewer, give one concrete tip on what a strong, regulator-aligned answer looks like for the pillar "'+p.title+'". Mention which of these regulators cares most: '+activeJuris().map(j=>j.name).join(', ')+'. Reply in '+lang+', first person, no preamble.';}
+    prompt='You are '+owlT().name+', a warm, concise operational-resilience coach for a bank. In 35 words or fewer, give one concrete tip on what a strong, regulator-aligned answer looks like for the pillar "'+p.title+'". Mention which of these regulators cares most: '+activeJuris().map(j=>j.name).join(', ')+'. Reply in '+lang+', first person, no preamble.';}
   else if(tab==='scanner'){
-    prompt='You are Dr. Owl, a warm, concise resilience coach. In 35 words or fewer, tell the user what details to include when describing an operational incident so it can be classified and scored accurately. Reply in '+lang+', first person, no preamble.';}
+    prompt='You are '+owlT().name+', a warm, concise resilience coach. In 35 words or fewer, tell the user what details to include when describing an operational incident so it can be classified and scored accurately. Reply in '+lang+', first person, no preamble.';}
   else {const r=concentrationRisks();
-    prompt=r.length?('You are Dr. Owl, a warm resilience coach. In 40 words or fewer, warn about this concentration risk and suggest one concrete mitigation: "'+r[0].display+'" is shared by '+r[0].vendors.join(', ')+'. Reply in '+lang+', first person, no preamble.')
-      :('You are Dr. Owl, a warm resilience coach. In 35 words or fewer, explain why mapping Nth-party (fourth-party) dependencies matters for operational resilience. Reply in '+lang+', first person, no preamble.');}
+    prompt=r.length?('You are '+owlT().name+', a warm resilience coach. In 40 words or fewer, warn about this concentration risk and suggest one concrete mitigation: "'+r[0].display+'" is shared by '+r[0].vendors.join(', ')+'. Reply in '+lang+', first person, no preamble.')
+      :('You are '+owlT().name+', a warm resilience coach. In 35 words or fewer, explain why mapping Nth-party (fourth-party) dependencies matters for operational resilience. Reply in '+lang+', first person, no preamble.');}
   try{ state.owlTip[tab]=await ollamaChat([{role:'user',content:prompt}],{temperature:0.6,onToken:(t2,full)=>{const b=document.getElementById('owlbubble'); if(b)b.textContent=full;}});
-  }catch(e){ state.owlTip[tab]='Hmm — I could not reach Gemma just now. Try 💡 again in a moment.'; }
+  }catch(e){ state.owlTip[tab]=owlT().error; }
   state.owlTip.busy=false; render();
 }
 function simScroll(){const c=document.getElementById('simlog'); if(c)c.scrollTop=c.scrollHeight;}
@@ -490,7 +498,7 @@ function viewIntro(){
   const risks=concentrationRisks();
   const svcs=state.tolerances.map(t=>t.service).filter(Boolean);
   return `<div class="pad fadein"><div class="hero">
-    ${owlWidget('idle','Hi, I\'m Dr. Owl. Let\'s run a live crisis drill for your bank — I\'ll grade your calls against the regulators.')}
+    ${owlWidget('idle', owlT().greet)}
     <div style="height:14px"></div>
     <div class="herobadge">● LIVE EXERCISE</div>
     <h1 style="margin-top:12px">Crisis Simulator</h1>
@@ -525,8 +533,8 @@ function viewRunning(){
 function viewReport(){
   return `<div class="pad fadein">
     <div class="between"><h2>After-action report</h2><span class="badge"><span class="dot"></span>on-device</span></div>
-    <div class="hint" style="margin-top:4px">Dr. Owl synthesised this from your decisions — on device.</div>
-    ${sim.report?`<div class="between" style="margin:12px 0">${owlWidget('happy','Your board report is ready — solid work under pressure.',true)}${(()=>{const r=(sim.report.match(/(\d{1,3})\s*\/\s*100/)||[])[1];return r?`<div style="text-align:center;flex:0 0 auto">${gaugeCount(r)}<div class="hint" style="margin:2px 0 0">rating</div></div>`:'';})()}</div>`:'<div style="height:12px"></div>'}
+    <div class="hint" style="margin-top:4px">${esc(owlT().name)} · ${esc(owlT().poweredBy)}</div>
+    ${sim.report?`<div class="between" style="margin:12px 0">${owlWidget('happy', owlT().reportReady, true)}${(()=>{const r=(sim.report.match(/(\d{1,3})\s*\/\s*100/)||[])[1];return r?`<div style="text-align:center;flex:0 0 auto">${gaugeCount(r)}<div class="hint" style="margin:2px 0 0">rating</div></div>`:'';})()}</div>`:'<div style="height:12px"></div>'}
     <div class="report" id="reportbody">${sim.report?fmtReport(sim.report):'<span class="cursor"></span> synthesising…'}</div>
     <div style="height:14px"></div>
     <div class="row"><button class="btn tonal sm" data-act="restartsim">↻ Run another</button>
