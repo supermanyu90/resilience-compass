@@ -24,6 +24,7 @@ and writes the board report — offline.
 - [Two implementations](#two-implementations)
 - [Run the web demo (real Gemma)](#run-the-web-demo-real-gemma)
 - [Architecture](#architecture)
+- [Partner deployment (SUSE K3s + NVIDIA NIM)](#partner-deployment-suse-k3s--nvidia-nim)
 - [The Flutter mobile app](#the-flutter-mobile-app)
 - [Regulatory coverage](#regulatory-coverage)
 - [How scoring works](#how-scoring-works)
@@ -152,6 +153,16 @@ Gemma runs locally. This is the core proof for the on‑device track.
 - **Streaming** — Ollama's NDJSON stream is piped straight to the browser, so tokens render live.
 - **Prompts & parsing** — the BCM/incident system prompts and the `[[ASSESSMENT]]` / JSON extraction are
   shared with the Flutter app (`lib/services/prompt_builder.dart`, `lib/services/json_extractor.dart`).
+
+## Partner deployment: SUSE K3s + NVIDIA NIM
+
+`serve.js` is **backend‑agnostic** — the browser always speaks one API and the proxy translates to
+**Ollama** *or* any **OpenAI‑compatible** endpoint, so the app runs unchanged on an **NVIDIA NIM** (a
+Gemma inference microservice) by setting two env vars (verified locally against an OpenAI `/v1`
+endpoint). `deploy/` ships a **Dockerfile** + **K3s manifests** to run the whole stack on **SUSE K3s**
+(edge Kubernetes, Traefik ingress, `local‑path` storage), with an optional **NVIDIA NIM** GPU variant and
+a note for **SUSE NeuVector** zero‑trust security. Inference stays on the cluster — still offline /
+on‑device. See **[deploy/README.md](deploy/README.md)**.
 
 ## The Flutter mobile app
 

@@ -1,0 +1,21 @@
+# Expose the app via Traefik (ships with SUSE K3s). Map resilience.local to your node IP in /etc/hosts,
+# e.g.  <node-ip>  resilience.local
+# Prefer a NodePort? Change the webapp Service type to NodePort instead of applying this Ingress.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: resilience
+  namespace: resilience-compass
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: resilience.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webapp
+                port:
+                  number: 80

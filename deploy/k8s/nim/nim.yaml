@@ -1,0 +1,82 @@
+# ---------------------------------------------------------------------------
+# NVIDIA NIM backend (alternative to Ollama) — a Gemma NIM microservice that
+# exposes the OpenAI-compatible API on :8000. serve.js talks to it unchanged
+# (MODEL_BACKEND=openai). Requirements:
+#   - An NVIDIA GPU node + the NVIDIA GPU Operator (bundled with SUSE AI).
+#   - An NGC account + API key (https://ngc.nvidia.com).
+# Then set the webapp ConfigMap to the NIM values (see ../30-webapp.yaml).
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ngc-api
+  namespace: resilience-compass
+type: Opaque
+stringData:
+  NGC_API_KEY: "REPLACE_WITH_YOUR_NGC_KEY"
+---
+# Pull secret for nvcr.io — create with:
+#   kubectl -n resilience-compass create secret docker-registry ngc-registry \
+#     --docker-server=nvcr.io --docker-username='$oauthtoken' --docker-password=$NGC_API_KEY
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nim-cache
+  namespace: resilience-compass
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 40Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nim
+  namespace: resilience-compass
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: nim }
+  template:
+    metadata:
+      labels: { app: nim }
+    spec:
+      imagePullSecrets:
+        - name: ngc-registry
+      containers:
+        - name: nim
+          # Verify the exact Gemma NIM image + tag available to you on NGC.
+          image: nvcr.io/nim/google/gemma-3-4b-it:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: NGC_API_KEY
+              valueFrom:
+                secretKeyRef: { name: ngc-api, key: NGC_API_KEY }
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: nim-cache
+              mountPath: /opt/nim/.cache
+          readinessProbe:
+            httpGet: { path: /v1/models, port: 8000 }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: nim-cache
+          persistentVolumeClaim:
+            claimName: nim-cache
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nim
+  namespace: resilience-compass
+spec:
+  selector: { app: nim }
+  ports:
+    - port: 8000
+      targetPort: 8000

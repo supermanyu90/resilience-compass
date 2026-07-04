@@ -1,0 +1,6 @@
+# Keep the build context tiny — only ship the web app.
+*
+!demo_preview
+!demo_preview/**
+demo_preview/README.md
+demo_preview/*.png

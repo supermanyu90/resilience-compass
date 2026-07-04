@@ -1,0 +1,58 @@
+# Local Gemma inference via Ollama (the default, GPU-optional backend).
+# For NVIDIA NIM instead, deploy k8s/nim/ and flip the webapp ConfigMap (see 30-webapp.yaml).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-models
+  namespace: resilience-compass
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path   # default provisioner on SUSE K3s (Rancher local-path)
+  resources:
+    requests:
+      storage: 12Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: resilience-compass
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: ollama }
+  template:
+    metadata:
+      labels: { app: ollama }
+    spec:
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          ports:
+            - containerPort: 11434
+          # NVIDIA GPU acceleration (with the NVIDIA GPU Operator, bundled in SUSE AI): uncomment.
+          # resources:
+          #   limits:
+          #     nvidia.com/gpu: 1
+          volumeMounts:
+            - name: models
+              mountPath: /root/.ollama
+          readinessProbe:
+            httpGet: { path: /api/version, port: 11434 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: ollama-models
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: resilience-compass
+spec:
+  selector: { app: ollama }
+  ports:
+    - port: 11434
+      targetPort: 11434

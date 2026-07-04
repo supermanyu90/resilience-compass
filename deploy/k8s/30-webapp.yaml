@@ -1,0 +1,53 @@
+# The Resilience Compass web app (serve.js UI + backend-agnostic model proxy).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resilience-config
+  namespace: resilience-compass
+data:
+  # ---- Default: local Ollama ----
+  MODEL_BACKEND: "ollama"
+  OLLAMA_URL: "http://ollama:11434"
+  # ---- To use NVIDIA NIM instead, comment the two lines above and use these: ----
+  # MODEL_BACKEND: "openai"
+  # OPENAI_BASE_URL: "http://nim:8000/v1"
+  # MODEL_ID: "google/gemma-3-4b-it"     # match the model id your NIM serves
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  namespace: resilience-compass
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: webapp }
+  template:
+    metadata:
+      labels: { app: webapp }
+    spec:
+      containers:
+        - name: webapp
+          image: resilience-compass-web:0.1
+          imagePullPolicy: IfNotPresent     # image imported into the K3s containerd (see deploy/README.md)
+          ports:
+            - containerPort: 8422
+          envFrom:
+            - configMapRef: { name: resilience-config }
+          readinessProbe:
+            httpGet: { path: /, port: 8422 }
+            initialDelaySeconds: 3
+          resources:
+            requests: { cpu: "50m", memory: "64Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp
+  namespace: resilience-compass
+spec:
+  selector: { app: webapp }
+  ports:
+    - port: 80
+      targetPort: 8422
