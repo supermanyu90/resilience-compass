@@ -19,6 +19,7 @@ and writes the board report — offline.
 ---
 
 ## Table of contents
+- [Partners](#partners)
 - [Why on‑device](#why-on-device)
 - [What it does](#what-it-does)
 - [Two implementations](#two-implementations)
@@ -36,6 +37,19 @@ and writes the board report — offline.
 - [Disclaimer](#disclaimer)
 
 ---
+
+## Partners
+
+| Partner | Product | Role in Resilience Compass |
+|---|---|---|
+| **Google** | **Gemma** (3 4B on web · 3n / small quantized on mobile) | The on‑device LLM behind every reply — the live crisis simulator, BCM assistant, incident scanner, Dr. Owl, and on‑device vision. |
+| **NVIDIA** | **NIM** (Gemma inference microservice) | Optional GPU‑accelerated, OpenAI‑compatible inference backend — drop‑in via `serve.js` (`MODEL_BACKEND=openai`). Edge story via **Jetson**. |
+| **SUSE** | **K3s** + **NeuVector** | Edge‑Kubernetes deployment of the whole stack (Traefik, `local‑path` storage); zero‑trust container security for the banking workload. |
+| **Nebius** | **AI Studio** | Hosted, OpenAI‑compatible cloud / no‑GPU inference tier — same backend switch, zero code change. |
+
+Local Ollama runs Gemma by default (offline / on‑device); the NVIDIA and Nebius backends share one
+OpenAI‑compatible path in `serve.js`, so switching is just configuration. See
+[Partner deployment](#partner-deployment-suse-k3s--nvidia-nim) and [`deploy/`](deploy/).
 
 ## Why on‑device
 

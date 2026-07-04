@@ -160,6 +160,9 @@
   .xptoast{position:absolute;top:52px;right:16px;background:#134a95;color:#fff;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;box-shadow:0 6px 16px rgba(20,45,80,.28);z-index:40;pointer-events:none;animation:xprise 1.6s ease forwards}
   .xptoast.big{background:linear-gradient(90deg,#1E6FD9,#0FB5A6);top:78px;font-size:12.5px}
   @keyframes xprise{0%{opacity:0;transform:translateY(8px) scale(.9)}14%{opacity:1;transform:translateY(0) scale(1)}72%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
+  .poweredby{margin-top:20px;padding-top:14px;border-top:1px solid var(--border);text-align:center;font-size:11px;color:var(--textSec);letter-spacing:.02em;line-height:1.6}
+  .poweredby b{color:var(--primary);font-weight:700}
+  .poweredby .pdivider{opacity:.5;margin:0 6px}
 </style>
 </head>
 <body>
@@ -559,7 +562,8 @@ function viewIntro(){
     <div style="height:16px"></div>
     <button class="btn danger" data-act="simstart" ${ready?'':'disabled'}>${ready?'▶  Start the exercise':'Connecting to Gemma…'}</button>
   </div>
-  <div class="hint" style="text-align:center;margin-top:12px">Tip: tap 🧰 for the BCM Assistant, Incident Scanner & vendor Tools.</div></div>`;
+  <div class="hint" style="text-align:center;margin-top:12px">Tip: tap 🧰 for the BCM Assistant, Incident Scanner & vendor Tools.</div>
+    <div class="poweredby">Powered by <b>Google Gemma</b>, on‑device<br><span class="pdivider">·</span>NVIDIA NIM<span class="pdivider">·</span>SUSE K3s<span class="pdivider">·</span>Nebius AI Studio</div></div>`;
 }
 function viewRunning(){
   const logs=sim.log.map((m,i)=>{ if(m.role==='dec')return `<div class="dec">${esc(m.text)}</div>`;
