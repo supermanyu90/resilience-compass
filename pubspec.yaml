@@ -1,0 +1,37 @@
+name: resilience_compass_mobile
+description: On-device (Gemma) operational-resilience assistant for banks — offline, privacy-first.
+publish_to: "none"
+version: 0.1.0+1
+
+# Targets current stable Flutter (uses Color.withValues + CardThemeData, both current-stable APIs).
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.29.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # On-device Gemma inference. Verified 1.2.0 on pub.dev; LiteRT-LM engine is the cross-platform default.
+  flutter_gemma: ^1.2.0
+  # VERIFY per current README: the engine is chosen via a SEPARATE plugin package. Add the LiteRT-LM
+  # engine (preferred) with the version the README specifies, e.g.:
+  #   flutter_gemma_litertlm: ^<version-from-readme>
+  # (Use flutter_gemma_mediapipe instead only if you deliberately target the .task/.bin path.)
+  # Local-only persistence for the Tools-panel registers (mirrors the web app's localStorage). Never synced.
+  shared_preferences: ^2.2.0
+  # Simple state management — nothing elaborate.
+  provider: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    # The bundled Gemma model is copied here after the license step (§3 of docs/PLAN.md).
+    # Kept out of git via .gitignore; register the concrete filename before building.
+    - assets/models/
