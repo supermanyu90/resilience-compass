@@ -84,7 +84,7 @@ class FrameworkData {
       id: 'rbi',
       name: 'RBI',
       region: 'India',
-      reference: 'RBI Guidance Note on Operational Risk Management & Operational Resilience (Apr 2024)',
+      reference: 'RBI Guidance Note on Operational Risk Management & Operational Resilience (Nov 2025)',
       citationStyle: CitationStyle.principlesBased,
     ),
     Jurisdiction(

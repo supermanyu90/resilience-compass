@@ -75,7 +75,7 @@ problem** — a direct fit for the **edge / on‑device AI** (and fintech) probl
 ## Why on‑device
 
 Operational resilience became hard regulation almost everywhere at once — APRA **CPS 230** (Australia),
-the EU's **DORA**, the UK PRA/FCA rules, **RBI**'s 2024 guidance, **HKMA**, **MAS**, and the US
+the EU's **DORA**, the UK PRA/FCA rules, **RBI**'s 2025 guidance, **HKMA**, **MAS**, and the US
 **Fed/OCC/FDIC** interagency paper. Every regulated bank must continuously self‑assess against these.
 
 But the data involved — incident details, control gaps, vendor dependencies, recovery objectives — is
@@ -251,7 +251,7 @@ the license walkthrough, and the `VERIFY`‑at‑build‑time checklist.
 | **HKMA** SPM OR‑2 | Hong Kong | Principles‑based (named section) |
 | **MAS** Operational Resilience / ORM | Singapore | Principles‑based |
 | **APRA** CPS 230 | Australia | Principles‑based |
-| **RBI** Guidance Note (Apr 2024) | India | Principles‑based |
+| **RBI** Guidance Note on Op. Risk Mgmt & Operational Resilience (Nov 2025) | India | Principles‑based |
 | **Fed / OCC / FDIC** Interagency Paper | United States | Principles‑based |
 | **DORA** — Regulation (EU) 2022/2554 | European Union | Article‑numbered (exact articles + RTS) |
 
