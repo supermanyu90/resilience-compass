@@ -1,0 +1,22 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  web:
+    name: web demo — syntax check + unit tests + smoke load
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: demo_preview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Syntax check (server + logic + tests)
+        run: npm run check
+      - name: Unit tests + smoke load
+        run: npm test

@@ -1,0 +1,13 @@
+{
+  "name": "resilience-compass-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Resilience Compass — on-device Gemma web demo: zero-dependency static+proxy server and pure, tested domain logic.",
+  "scripts": {
+    "start": "node serve.js",
+    "check": "node --check serve.js && node --check logic.js && node --check logic.test.js && node --check smoke.js",
+    "test": "node --test && node smoke.js"
+  },
+  "engines": { "node": ">=18" },
+  "license": "UNLICENSED"
+}

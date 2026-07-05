@@ -48,6 +48,19 @@ const TYPES = {
 };
 const modFor = (u) => (u.protocol === 'https:' ? https : http);
 const NDJSON = { 'content-type': 'application/x-ndjson', 'cache-control': 'no-cache' };
+const MAX_BODY = 12 * 1024 * 1024; // hard cap on buffered request bodies (audio uploads etc.)
+
+// Buffer a request body with a size limit; replies 413 and aborts if exceeded.
+function bufferBody(req, res, max, binary, cb) {
+  let size = 0; const chunks = [];
+  req.on('data', (c) => {
+    size += c.length;
+    if (size > max) { if (!res.headersSent) { res.writeHead(413, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: 'payload too large' })); } req.destroy(); return; }
+    chunks.push(c);
+  });
+  req.on('end', () => { if (res.writableEnded) return; cb(binary ? Buffer.concat(chunks) : Buffer.concat(chunks).toString()); });
+  req.on('error', () => { if (!res.writableEnded) { res.writeHead(400); res.end(); } });
+}
 
 const server = http.createServer((req, res) => {
   if (req.url.startsWith('/gradium/')) return handleGradium(req, res);
@@ -73,9 +86,7 @@ function handleGradium(req, res) {
 
 // text -> speech (returns audio/wav bytes)
 function gradiumTTS(req, res) {
-  let raw = '';
-  req.on('data', (c) => (raw += c));
-  req.on('end', () => {
+  bufferBody(req, res, 2e6, false, (raw) => {
     let text = '';
     try { text = (JSON.parse(raw || '{}').text || '').toString(); } catch (e) {}
     if (!text.trim()) { res.writeHead(400, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ error: 'no text' })); }
@@ -93,10 +104,7 @@ function gradiumTTS(req, res) {
 
 // speech (raw wav bytes) -> text  (parses Gradium's NDJSON, returns {text})
 function gradiumSTT(req, res) {
-  const chunks = [];
-  req.on('data', (c) => chunks.push(c));
-  req.on('end', () => {
-    const audio = Buffer.concat(chunks);
+  bufferBody(req, res, MAX_BODY, true, (audio) => {
     const u = new URL(GRADIUM_BASE + '/post/speech/asr?input_format=wav');
     const rq = https.request({ hostname: u.hostname, port: u.port || 443, path: u.pathname + u.search, method: 'POST',
       headers: { 'content-type': 'audio/wav', 'x-api-key': GRADIUM_KEY, 'content-length': audio.length } }, (r) => {
@@ -135,9 +143,7 @@ function handleOllama(req, res) {
 // ---------- OpenAI-compatible backend (NVIDIA NIM / vLLM / Ollama /v1) ----------
 function handleOpenAI(req, res) {
   const pathname = req.url.split('?')[0];
-  let raw = '';
-  req.on('data', (c) => (raw += c));
-  req.on('end', () => {
+  bufferBody(req, res, 2e6, false, (raw) => {
     if (req.method === 'GET' && pathname === '/api/tags') return listModels(res);
     if (req.method === 'POST' && pathname === '/api/chat') return chatCompletions(raw, res);
     res.writeHead(404, { 'content-type': 'application/json' });
@@ -237,14 +243,25 @@ function chatCompletions(raw, res) {
 
 // ---------- static files (confined to ROOT) ----------
 function serveStatic(req, res) {
-  let rel = decodeURIComponent(req.url.split('?')[0]);
+  if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('method not allowed'); }
+  let rel;
+  try { rel = decodeURIComponent(req.url.split('?')[0]); } catch (e) { res.writeHead(400); return res.end('bad request'); }
   if (rel === '/') rel = '/index.html';
   const filePath = path.normalize(path.join(ROOT, rel));
-  if (!filePath.startsWith(ROOT)) { res.writeHead(403); return res.end('forbidden'); }
+  // confine strictly to ROOT (avoid the sibling-prefix escape of a bare startsWith(ROOT))
+  if (filePath !== ROOT && !filePath.startsWith(ROOT + path.sep)) { res.writeHead(403); return res.end('forbidden'); }
+  // serve only known web assets; never the server script, tests, manifests or dotfiles
+  const base = path.basename(filePath);
+  if (!TYPES[path.extname(filePath)] || base === 'serve.js' || /\.test\.js$/.test(base) || base.startsWith('.') || /^package(-lock)?\.json$/.test(base)) {
+    res.writeHead(404); return res.end('not found');
+  }
   fs.readFile(filePath, (err, data) => {
     if (err) { res.writeHead(404); return res.end('not found'); }
-    res.writeHead(200, { 'content-type': TYPES[path.extname(filePath)] || 'application/octet-stream' });
-    res.end(data);
+    res.writeHead(200, {
+      'content-type': TYPES[path.extname(filePath)] || 'application/octet-stream',
+      'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'x-frame-options': 'DENY',
+    });
+    res.end(req.method === 'HEAD' ? undefined : data);
   });
 }
 
