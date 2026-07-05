@@ -31,6 +31,12 @@
   body.mode-desktop .bubble,body.mode-desktop .fac,body.mode-desktop .dec{max-width:600px}
   body.mode-desktop .owlbubble{max-width:520px}
   body.mode-desktop .owlhelper .owlbubble{max-width:760px}
+  /* on a real phone, either mode fills the screen (no oversized frame) */
+  @media (max-width:560px){
+    .page{padding:8px 0 0;gap:6px}
+    .banner{display:none}
+    .device{width:100%!important;max-width:100%;height:calc(100dvh - 44px)!important;border-radius:0!important;border-left:none;border-right:none;box-shadow:none!important}
+  }
   #app{flex:1;min-height:0;display:flex;flex-direction:column}
   .body2{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
   .pad{padding:20px}
@@ -846,10 +852,16 @@ function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.val
   }
 }
 
-// view mode: desktop web (default) or mobile phone-frame — user switchable, persisted
-function applyViewMode(m){document.body.className='mode-'+m; LS.set('viewmode',m); document.querySelectorAll('.vswitch-btn').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));}
-document.querySelectorAll('.vswitch-btn').forEach(b=>b.addEventListener('click',()=>applyViewMode(b.dataset.mode)));
-applyViewMode(LS.get('viewmode','desktop'));
+// view mode: auto-pick by screen size (mobile on phones, desktop on wide screens);
+// an explicit user choice is remembered and overrides the auto-pick.
+function setViewMode(m){document.body.className='mode-'+m; document.querySelectorAll('.vswitch-btn').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));}
+const PHONE_MQ=window.matchMedia('(max-width: 760px)');
+function autoViewMode(){return PHONE_MQ.matches ? 'mobile' : 'desktop';}
+document.querySelectorAll('.vswitch-btn').forEach(b=>b.addEventListener('click',()=>{LS.set('viewmode',b.dataset.mode); setViewMode(b.dataset.mode);}));
+(function(){const saved=LS.get('viewmode',null);
+  if(saved){setViewMode(saved);}
+  else {setViewMode(autoViewMode()); PHONE_MQ.addEventListener('change',()=>{if(!LS.get('viewmode',null))setViewMode(autoViewMode());});}
+})();
 render();
 autoConnect();
 </script>
