@@ -130,6 +130,18 @@
   .tstep{display:flex;gap:10px;padding:7px 0;position:relative}
   .tstep:not(:last-child):before{content:"";position:absolute;left:11px;top:27px;bottom:-7px;width:2px;background:var(--border)}
   .tdot{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:0 0 auto;z-index:1}
+  .htabs{display:flex;gap:6px}
+  .htab{flex:1;text-align:center;padding:8px;border-radius:10px;background:var(--surfaceAlt);color:var(--textSec);font-size:13px;font-weight:600;cursor:pointer}
+  .htab.on{background:var(--primary);color:#fff}
+  .howto{margin:0;padding-left:18px;font-size:13px;line-height:1.55;color:var(--text)}
+  .howto li{margin-bottom:8px}
+  .faq .qa{padding:10px 0;border-top:1px solid var(--border)}
+  .faq .qa:first-child{border-top:none}
+  .faq .q{font-weight:700;font-size:13px}
+  .faq .a{font-size:12.5px;color:var(--textSec);margin-top:3px;line-height:1.5}
+  .impact-list{margin:8px 0 0;padding-left:18px;font-size:12.5px;line-height:1.5;color:var(--textSec)}
+  .impact-list li{margin-bottom:6px}
+  .impact-list b{color:var(--text)}
   .fadein{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   /* Dr. Owl mascot */
   .owl{display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -304,6 +316,7 @@ const state = {
   tolerances: LS.get('tol', SEED_TOL.map(x=>({...x}))), vendors: LS.get('ven', SEED_VEN.map(v=>({...v,nth:[...v.nth]}))),
   owlTip:{assistant:'',scanner:'',tools:'',busy:false},
   xp: LS.get('xp',0),
+  helpTab:'howto',
   modal:null,
 };
 state.juris.add('iso22301');
@@ -650,6 +663,7 @@ function header(){
       <div class="icons"><select id="langsel" style="width:auto;padding:5px 6px">${langOpts}</select>
         <button class="iconbtn" data-act="toggleview" title="${state.view==='sim'?'Advisor tools':'Crisis simulator'}">${state.view==='sim'?'🧰':'🔴'}</button>
         <button class="iconbtn" data-act="frameworks" title="Regulatory frameworks">⚖️</button>
+        <button class="iconbtn" data-act="help" title="Help — how to use & FAQ">❓</button>
         <button class="iconbtn" data-act="about">ⓘ</button></div></div>`;
 }
 
@@ -677,7 +691,16 @@ function viewIntro(){
     <div style="height:16px"></div>
     <button class="btn danger" data-act="simstart" ${ready?'':'disabled'}>${ready?'▶  Start the exercise':'Connecting to Gemma…'}</button>
   </div>
-  <div class="hint" style="text-align:center;margin-top:12px">Tip: tap 🧰 for the BCM Assistant, Incident Scanner & vendor Tools.</div>
+  <div class="hint" style="text-align:center;margin-top:12px">Tip: tap 🧰 for the BCM Assistant, Incident Scanner & vendor Tools · ❓ for how-to & FAQ.</div>
+    <div class="card impact" style="margin-top:16px;text-align:left">
+      <div class="sechead">🎯 Why it matters — the impact</div>
+      <p class="hint" style="margin:8px 0 0">Operational resilience is now mandatory regulation worldwide (EU <b>DORA</b>, APRA CPS 230, RBI, HKMA, MAS, the US interagency rules) — yet the data involved is too sensitive for cloud AI, so teams still lean on spreadsheets and consultants. This is on-device AI for a privacy-critical, heavily-regulated problem.</p>
+      <ul class="impact-list">
+        <li><b>Who it's for:</b> banks' operational-resilience, BCM, compliance & risk teams — and, by extension, any regulated enterprise (insurers, healthcare, critical infrastructure).</li>
+        <li><b>Why it's useful:</b> an instant, private, on-device copilot — the only kind usable on incident, BCM and vendor data that can't leave the building.</li>
+        <li><b>Long-term potential & growth:</b> more jurisdictions, full-text regulation grounding, edge deployment at branches (NVIDIA Jetson / SUSE K3s), team features, and expansion beyond banking to every regulated sector — partner-ready (NVIDIA · SUSE · Nebius).</li>
+      </ul>
+    </div>
     <div class="poweredby">Powered by <b>Google Gemma</b>, on‑device<br><span class="pdivider">·</span>NVIDIA NIM<span class="pdivider">·</span>SUSE K3s<span class="pdivider">·</span>Nebius AI Studio</div></div>`;
 }
 function viewRunning(){
@@ -786,6 +809,27 @@ function aboutModal(){const s=S();return `<div class="modal"><div class="sheet f
   <div class="hint">On-device model (Ollama): <span class="modeltag">${esc(state.modelTag||'—')}</span></div><div style="height:8px"></div>
   <div class="card"><div class="row"><span>ℹ️</span><b>${s.disc}</b></div><div class="hint" style="margin-top:8px">${DISCLAIMER}</div></div>
   <div style="text-align:right;margin-top:8px"><button class="btn sm" data-act="closemodal">OK</button></div></div></div>`}
+function helpModal(){const t=state.helpTab||'howto';
+  const tabs=`<div class="htabs"><div class="htab${t==='howto'?' on':''}" data-helptab="howto">How to use</div><div class="htab${t==='faq'?' on':''}" data-helptab="faq">FAQ</div></div>`;
+  const body=t==='faq'?helpFAQ():helpHowTo();
+  return `<div class="modal"><div class="sheet fadein" style="max-width:520px"><h2 style="margin-bottom:12px">Help</h2>${tabs}<div style="margin-top:14px">${body}</div><div style="text-align:right;margin-top:14px"><button class="btn sm" data-act="closemodal">Done</button></div></div></div>`;}
+function helpHowTo(){return `<ol class="howto">
+  <li><b>Connect.</b> The app loads Gemma on-device automatically — wait for the model chip in the top bar.</li>
+  <li><b>Run a crisis drill.</b> On the home screen tap <b>Start the exercise</b>, make your decisions, then <b>End &amp; report</b> for an after-action board report.</li>
+  <li><b>Pick your regulators.</b> Tap ⚖️ to choose frameworks (ISO 22301, EU DORA, APRA, HKMA…); citations follow your selection.</li>
+  <li><b>Use the advisor.</b> Tap 🧰 for the BCM Assistant (pillar self-assessment), the Incident Scanner (+ DORA reporting timeline) and vendor Tools.</li>
+  <li><b>Ask Dr. Owl.</b> Tap 💡 on any advisor tab for a live, Gemma-powered coaching tip.</li>
+  <li><b>Switch language</b> any time (top-right) — replies and Dr. Owl follow.</li>
+  <li><b>Go offline.</b> Once the model is loaded it works in airplane mode; your data never leaves the device.</li>
+</ol>`;}
+function helpFAQ(){return `<div class="faq">
+  <div class="qa"><div class="q">Is this real AI or scripted?</div><div class="a">Real Google Gemma running locally via Ollama — every reply is generated on this machine.</div></div>
+  <div class="qa"><div class="q">Does my data leave the device?</div><div class="a">No. All inference is on-device; nothing is sent to a server, and your registers persist locally only.</div></div>
+  <div class="qa"><div class="q">Which regulations does it cover?</div><div class="a">ISO 22301, EU DORA, APRA CPS 230, HKMA, MAS, RBI and the US Fed/OCC/FDIC. DORA citations are grounded by on-device retrieval.</div></div>
+  <div class="qa"><div class="q">Is this legal or compliance advice?</div><div class="a">No — a self-assessment aid, not legal advice or a certification audit. Always verify against primary sources.</div></div>
+  <div class="qa"><div class="q">Can it run on a phone / offline?</div><div class="a">Yes — built for the edge (a Flutter mobile build exists) and works offline after the model loads.</div></div>
+  <div class="qa"><div class="q">Which model, and can I change it?</div><div class="a">Gemma (default gemma3:4b via Ollama). Pluggable to NVIDIA NIM or Nebius AI Studio via one config — same OpenAI-compatible interface.</div></div>
+</div>`;}
 
 // ================= advisor behaviour =================
 async function autoConnect(){
@@ -835,6 +879,7 @@ function bind(){
   el.querySelectorAll('[data-del]').forEach(n=>n.onclick=()=>{const i=+n.dataset.i; if(n.dataset.del==='tol')state.tolerances.splice(i,1); else state.vendors.splice(i,1); persist(); render();});
   el.querySelectorAll('[data-act]').forEach(n=>n.onclick=()=>act(n.dataset.act));
   el.querySelectorAll('[data-jtoggle]').forEach(n=>n.onclick=()=>toggleJuris(n.dataset.jtoggle));
+  el.querySelectorAll('[data-helptab]').forEach(n=>n.onclick=()=>{state.helpTab=n.dataset.helptab; state.modal=helpModal(); render();});
   el.querySelectorAll('[data-countup]').forEach(n=>{const to=+n.dataset.countup||0; let cur=0; const step=Math.max(1,Math.round(to/35)); const iv=setInterval(()=>{cur+=step; if(cur>=to){cur=to;clearInterval(iv);} n.textContent=cur;},26);});
 }
 function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
@@ -845,6 +890,7 @@ function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.val
       break;
     case'owltip': fetchOwlTip(state.advTab); break;
     case'frameworks': state.modal=frameworksModal(); render(); break;
+    case'help': state.helpTab='howto'; state.modal=helpModal(); render(); break;
     case'about': state.modal=aboutModal(); render(); break;
     case'closemodal': state.modal=null; render(); break;
     case'simstart': startSim(); break;
