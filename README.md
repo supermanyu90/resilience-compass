@@ -14,7 +14,7 @@ and writes the board report — offline.
 - 🔒 **Private by construction** — no network calls after the model loads; inputs, chats, and registers stay on the device.
 - 📶 **Works offline** — put the machine in airplane mode and it keeps answering.
 - 🌍 **6 languages** — English, हिन्दी, 简体中文, Español, Français, Português.
-- 🏛️ **Regulator‑aware** — cites ISO 22301, HKMA, MAS, APRA, RBI, and the US Fed/OCC/FDIC by name.
+- 🏛️ **Regulator‑aware** — cites ISO 22301, the EU's **DORA**, HKMA, MAS, APRA, RBI, and the US Fed/OCC/FDIC by name.
 
 ---
 
@@ -207,6 +207,7 @@ the license walkthrough, and the `VERIFY`‑at‑build‑time checklist.
 | **APRA** CPS 230 | Australia | Principles‑based |
 | **RBI** Guidance Note (Apr 2024) | India | Principles‑based |
 | **Fed / OCC / FDIC** Interagency Paper | United States | Principles‑based |
+| **DORA** — Regulation (EU) 2022/2554 | European Union | Article‑numbered (exact articles + RTS) |
 
 The app preserves the honest distinction that ISO is clause‑numbered while the others are
 principles‑based — and instructs the model never to fabricate a clause number for a principles‑based

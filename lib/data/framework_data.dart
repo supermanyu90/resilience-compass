@@ -94,6 +94,13 @@ class FrameworkData {
       reference: 'Interagency Paper on Sound Practices to Strengthen Operational Resilience',
       citationStyle: CitationStyle.principlesBased,
     ),
+    Jurisdiction(
+      id: 'dora',
+      name: 'DORA (EU)',
+      region: 'European Union',
+      reference: 'DORA — Regulation (EU) 2022/2554 (Articles + Regulatory Technical Standards)',
+      citationStyle: CitationStyle.clauseNumbered, // article-numbered — cite exact Articles
+    ),
   ];
 
   /// The 10 BCM pillars, in the guided-assessment order.
@@ -178,8 +185,9 @@ class FrameworkData {
   };
 
   static const String disclaimer =
-      'ISO 22301 references are clause-numbered; HKMA, MAS, APRA, RBI and the US interagency '
-      'guidance are principles-based (references point to a named section, not a clause number). '
-      'Resilience Compass is a self-assessment aid — not legal advice or a certification audit — '
-      'and does not guarantee regulatory compliance.';
+      'ISO 22301 (clauses) and the EU DORA — Regulation (EU) 2022/2554 (articles) are precisely '
+      'numbered; HKMA, MAS, APRA, RBI and the US interagency guidance are principles-based '
+      '(references point to a named section, not a clause number). Resilience Compass is a '
+      'self-assessment aid — not legal advice or a certification audit — and does not guarantee '
+      'regulatory compliance.';
 }

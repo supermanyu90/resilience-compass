@@ -99,6 +99,10 @@
   .modal{position:absolute;inset:0;background:rgba(20,40,70,.35);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
   .sheet{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;width:100%;max-height:90%;overflow-y:auto;box-shadow:0 12px 40px rgba(20,45,80,.2)}
   .field{margin-bottom:10px}.field small{color:var(--textSec);display:block;margin-bottom:4px}
+  .jrow{display:flex;align-items:flex-start;gap:10px;padding:10px 4px;border-top:1px solid var(--border);cursor:pointer}
+  .jrow.lock{cursor:default}
+  .jcheck{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);flex:0 0 auto;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+  .jcheck.on{background:var(--primary);border-color:var(--primary)}
   .fadein{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   /* Dr. Owl mascot */
   .owl{display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -195,9 +199,10 @@ const JURIS = [
   {id:'apra',name:'APRA',region:'Australia',ref:'APRA CPS 230',clause:false},
   {id:'rbi',name:'RBI',region:'India',ref:'RBI Guidance Note (Apr 2024)',clause:false},
   {id:'us_interagency',name:'Fed / OCC / FDIC',region:'United States',ref:'Interagency Sound Practices',clause:false},
+  {id:'dora',name:'DORA (EU)',region:'European Union',ref:'DORA — Regulation (EU) 2022/2554 (Articles + RTS)',clause:true},
 ];
 const CATEGORIES = ['people','process','technology','third-party','cyber','facilities'];
-const DISCLAIMER = "ISO 22301 references are clause-numbered; HKMA, MAS, APRA, RBI and the US interagency guidance are principles-based. Resilience Compass is a self-assessment aid — not legal advice or a certification audit — and does not guarantee regulatory compliance.";
+const DISCLAIMER = "ISO 22301 (clauses) and the EU DORA — Regulation (EU) 2022/2554 (articles) are precisely numbered; HKMA, MAS, APRA, RBI and the US interagency guidance are principles-based. Resilience Compass is a self-assessment aid — not legal advice or a certification audit — and does not guarantee regulatory compliance.";
 const SEED_TOL = [
   {service:'Retail payments (FPS / UPI)', rto:'2h', rpo:'15m', mtpd:'12h', srto:'4h'},
   {service:'Online & mobile banking', rto:'4h', rpo:'30m', mtpd:'24h', srto:''},
@@ -233,7 +238,7 @@ const STR = {
 const LS = {get:(k,d)=>{try{return JSON.parse(localStorage.getItem('rc_'+k))??d}catch(e){return d}},set:(k,v)=>localStorage.setItem('rc_'+k,JSON.stringify(v))};
 const state = {
   lang: LS.get('lang','en'),
-  juris: new Set(LS.get('juris',['iso22301','hkma','apra'])),
+  juris: new Set(LS.get('juris',['iso22301','dora','apra'])),
   modelStatus:'idle', modelTag:null, modelError:null,
   view:'sim', advTab:'assistant',
   sim:{phase:'intro', convo:[], log:[], turns:0, busy:false, report:'', reportBusy:false, seeding:false, seedMsg:''},
@@ -255,6 +260,12 @@ const matColor = m => m>=4?'#16A34A':m===3?'#1E6FD9':m===2?'#E0900C':'#E23D42';
 const bandColor = s => s>=67?'#16A34A':s>=34?'#E0900C':'#E23D42';
 function activeJuris(){return JURIS.filter(j=>j.always||state.juris.has(j.id))}
 function persist(){LS.set('lang',state.lang);LS.set('juris',[...state.juris]);LS.set('tol',state.tolerances);LS.set('ven',state.vendors)}
+function toggleJuris(id){const j=JURIS.find(x=>x.id===id); if(!j||j.always)return; state.juris.has(id)?state.juris.delete(id):state.juris.add(id); persist(); state.modal=frameworksModal(); render();}
+function frameworksModal(){
+  const rows=JURIS.map(j=>{const on=j.always||state.juris.has(j.id);
+    return `<div class="jrow${j.always?' lock':''}"${j.always?'':` data-jtoggle="${j.id}"`}><div class="jcheck${on?' on':''}">${on?'✓':''}</div><div style="flex:1"><div style="font-weight:700;font-size:13px">${esc(j.name)} · ${esc(j.region)}</div><div class="hint" style="margin:2px 0 0">${esc(j.ref)}</div></div>${j.always?'<span class="pill">always on</span>':''}</div>`;}).join('');
+  return `<div class="modal"><div class="sheet fadein"><h2>Regulatory frameworks</h2><div class="hint" style="margin:6px 0 6px">Pick the regimes that apply — the Assistant and crisis simulator cite whichever you select. ISO 22301 is the always-on baseline.</div>${rows}<div style="text-align:right;margin-top:12px"><button class="btn sm" data-act="closemodal">Done</button></div></div></div>`;
+}
 
 // ================= scoring + concentration =================
 function sevWeight(s){return s==='low'?1:s==='high'?3:2}
@@ -291,7 +302,7 @@ function fileToB64(file){return new Promise((res,rej)=>{const r=new FileReader()
 
 // ================= prompts + parsing (Advisor) =================
 function replyLang(){return REPLY[state.lang]||'English'}
-function jurisdictionBlock(){return activeJuris().map(j=>'- '+j.name+' ('+j.region+'): '+j.ref+(j.clause?' — cite exact clause numbers':' — principles-based, cite the named section, not a clause number')).join('\n');}
+function jurisdictionBlock(){return activeJuris().map(j=>'- '+j.name+' ('+j.region+'): '+j.ref+(j.clause?' — cite exact clause/article numbers':' — principles-based, cite the named section, not a clause number')).join('\n');}
 function groundingFor(pillar){
   if(pillar.id==='tolerance'&&state.tolerances.length){
     const l=state.tolerances.map(t=>'- '+t.service+': '+([t.rto&&'RTO '+t.rto,t.rpo&&'RPO '+t.rpo,t.mtpd&&'MTPD '+t.mtpd,t.srto&&'SRTO '+t.srto].filter(Boolean).join(', ')||'(no objectives set)'));
@@ -535,6 +546,7 @@ function header(){
       <div class="row"><span class="badge"><span class="dot"></span>${S().offline}</span>${status}</div>
       <div class="icons"><select id="langsel" style="width:auto;padding:5px 6px">${langOpts}</select>
         <button class="iconbtn" data-act="toggleview" title="${state.view==='sim'?'Advisor tools':'Crisis simulator'}">${state.view==='sim'?'🧰':'🔴'}</button>
+        <button class="iconbtn" data-act="frameworks" title="Regulatory frameworks">⚖️</button>
         <button class="iconbtn" data-act="about">ⓘ</button></div></div>`;
 }
 
@@ -717,6 +729,7 @@ function bind(){
   el.querySelectorAll('[data-seg]').forEach(n=>n.onclick=()=>{state[n.dataset.seg]=+n.dataset.v; const ta=document.getElementById('inc'); if(ta)state.incidentText=ta.value; render();});
   el.querySelectorAll('[data-del]').forEach(n=>n.onclick=()=>{const i=+n.dataset.i; if(n.dataset.del==='tol')state.tolerances.splice(i,1); else state.vendors.splice(i,1); persist(); render();});
   el.querySelectorAll('[data-act]').forEach(n=>n.onclick=()=>act(n.dataset.act));
+  el.querySelectorAll('[data-jtoggle]').forEach(n=>n.onclick=()=>toggleJuris(n.dataset.jtoggle));
   el.querySelectorAll('[data-countup]').forEach(n=>{const to=+n.dataset.countup||0; let cur=0; const step=Math.max(1,Math.round(to/35)); const iv=setInterval(()=>{cur+=step; if(cur>=to){cur=to;clearInterval(iv);} n.textContent=cur;},26);});
 }
 function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
@@ -726,6 +739,7 @@ function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.val
         else if((state.advTab==='scanner'||state.advTab==='tools')&&!state.owlTip[state.advTab]&&!state.owlTip.busy&&!state.busy)fetchOwlTip(state.advTab); }
       break;
     case'owltip': fetchOwlTip(state.advTab); break;
+    case'frameworks': state.modal=frameworksModal(); render(); break;
     case'about': state.modal=aboutModal(); render(); break;
     case'closemodal': state.modal=null; render(); break;
     case'simstart': startSim(); break;
