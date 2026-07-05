@@ -149,6 +149,9 @@
   @keyframes recpulse{0%,100%{box-shadow:0 0 0 0 rgba(226,61,66,.5)}50%{box-shadow:0 0 0 6px rgba(226,61,66,0)}}
   .spkbtn{font-size:11px;padding:2px 7px;border-radius:8px;margin-left:8px;vertical-align:middle}
   .spkbtn.playing{background:var(--primary);color:#fff;border-color:var(--primary)}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  }
   .fadein{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   /* Dr. Owl mascot */
   .owl{display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -335,6 +338,8 @@ function S(){return STR[state.lang]}
 // ================= helpers =================
 const el = document.getElementById('app');
 const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// coalesce rapid streaming updates to at most one DOM write per animation frame
+function rafThrottle(fn){let pending=false,last;return a=>{last=a;if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;fn(last);});};}
 const matColor = m => m>=4?'#16A34A':m===3?'#1E6FD9':m===2?'#E0900C':'#E23D42';
 const bandColor = s => s>=67?'#16A34A':s>=34?'#E0900C':'#E23D42';
 function activeJuris(){return JURIS.filter(j=>j.always||state.juris.has(j.id))}
@@ -548,7 +553,7 @@ function helperOwl(tab){
   const t=state.owlTip, busy=t.busy;
   const line=busy?owlT().thinking:(t[tab]||defaultTip(tab));
   const disabled=(busy||state.busy)?'disabled':'';
-  const btn=`<button class="iconbtn" data-act="owltip" title="${esc(owlT().name)} · Gemma" ${disabled}>${busy?'…':(t[tab]?'↻':'💡')}</button>`;
+  const btn=`<button class="iconbtn" data-act="owltip" aria-label="Ask ${esc(owlT().name)} for a Gemma tip" title="${esc(owlT().name)} · Gemma" ${disabled}>${busy?'…':(t[tab]?'↻':'💡')}</button>`;
   return `<div class="owlhelper">${owlWidget(busy?'thinking':'idle', line, true)}${btn}${(!busy&&t[tab])?speakBtn('owl',''):''}</div>`;
 }
 async function fetchOwlTip(tab){
@@ -581,7 +586,8 @@ async function simTurn(userContent, display){
   sim.busy=true; render(); simScroll();
   const ow=document.getElementById('owl'); if(ow)ow.classList.add('talking');
   const idx=sim.log.length-1; let raw='';
-  try{ raw=await ollamaChat(sim.convo,{temperature:0.85,onToken:(t,full)=>{const n=document.getElementById('log-'+idx); if(n)n.innerHTML=fmtFacDisplay(full)+'<span class="cursor"></span>'; simScroll();}});
+  const paintFac=rafThrottle(full=>{const n=document.getElementById('log-'+idx); if(n)n.innerHTML=fmtFacDisplay(full)+'<span class="cursor"></span>'; simScroll();});
+  try{ raw=await ollamaChat(sim.convo,{temperature:0.85,onToken:(t,full)=>paintFac(full)});
     sim.convo.push({role:'assistant',content:raw}); entry.text=raw;
   }catch(e){ entry.text='⚠️ '+e.message; }
   entry.streaming=false; sim.busy=false; render(); simScroll();
@@ -589,7 +595,8 @@ async function simTurn(userContent, display){
 function submitDecision(){const ta=document.getElementById('decision'); if(!ta)return; const t=ta.value.trim(); if(!t||sim.busy)return; ta.value=''; sim.turns++; awardXp(10); simTurn(t,true);}
 async function endSim(){
   if(sim.busy)return; sim.phase='report'; sim.report=''; sim.reportBusy=true; render();
-  try{ sim.report=await ollamaChat([...sim.convo,{role:'user',content:reportRequest()}],{temperature:0.4,onToken:(t,full)=>{const n=document.getElementById('reportbody'); if(n)n.innerHTML=fmtReport(full);}}); awardXp(40);
+  const paintRep=rafThrottle(full=>{const n=document.getElementById('reportbody'); if(n)n.innerHTML=fmtReport(full);});
+  try{ sim.report=await ollamaChat([...sim.convo,{role:'user',content:reportRequest()}],{temperature:0.4,onToken:(t,full)=>paintRep(full)}); awardXp(40);
   }catch(e){ sim.report='⚠️ '+e.message; }
   sim.reportBusy=false; render();
 }
@@ -623,8 +630,8 @@ async function genPack(){
 // ================= views =================
 // ---- Voice: Gradium STT (mic) + TTS (speaker), routed through serve.js (key server-side) ----
 async function checkVoice(){ try{ const r=await fetch('/gradium/status'); state.voice={enabled:!!(await r.json()).enabled}; if(state.voice.enabled)render(); }catch(e){ state.voice={enabled:false}; } }
-function micBtn(id,label){ return state.voice.enabled?`<button class="micbtn${label?' labeled':''}" data-mic="${id}" title="Dictate (voice via Gradium)">🎤${label?' '+esc(label):''}</button>`:''; }
-function speakBtn(kind,ref){ return state.voice.enabled?`<button class="spkbtn" data-speak="${kind}" data-ref="${ref}" title="Read aloud (voice via Gradium)">🔊</button>`:''; }
+function micBtn(id,label){ return state.voice.enabled?`<button class="micbtn${label?' labeled':''}" data-mic="${id}" aria-label="Dictate by voice" title="Dictate (voice via Gradium)">🎤${label?' '+esc(label):''}</button>`:''; }
+function speakBtn(kind,ref){ return state.voice.enabled?`<button class="spkbtn" data-speak="${kind}" data-ref="${ref}" aria-label="Read aloud" title="Read aloud (voice via Gradium)">🔊</button>`:''; }
 let _mediaRec=null,_recChunks=[],_recTarget=null;
 async function toggleDictate(id){
   if(!state.voice.enabled)return;
@@ -658,7 +665,12 @@ async function speak(text,btn){ if(!state.voice.enabled||!text)return;
     _ttsAudio.onerror=()=>{ if(btn)btn.classList.remove('playing'); }; await _ttsAudio.play();
   }catch(e){ if(btn)btn.classList.remove('playing'); console.error('tts',e); } }
 
-function render(){ el.innerHTML=viewShell(); if(state.modal)el.insertAdjacentHTML('beforeend',state.modal); bind(); }
+function render(){ el.innerHTML=viewShell();
+  if(state.modal){ el.insertAdjacentHTML('beforeend',state.modal);
+    const sh=el.querySelector('.modal .sheet'); if(sh){ sh.setAttribute('role','dialog'); sh.setAttribute('aria-modal','true'); sh.setAttribute('tabindex','-1'); sh.focus(); } }
+  document.documentElement.lang=state.lang;
+  bind();
+}
 function viewShell(){ return header()+`<div class="body2">${state.view==='sim'?viewSim():viewAdvisor()}</div>`; }
 function header(){
   const st=state.modelStatus;
@@ -678,11 +690,11 @@ function header(){
     </div>
     <div class="appbar">
       <div class="row"><span class="badge"><span class="dot"></span>${S().offline}</span>${status}</div>
-      <div class="icons"><select id="langsel" style="width:auto;padding:5px 6px">${langOpts}</select>
-        <button class="iconbtn" data-act="toggleview" title="${state.view==='sim'?'Advisor tools':'Crisis simulator'}">${state.view==='sim'?'🧰':'🔴'}</button>
-        <button class="iconbtn" data-act="frameworks" title="Regulatory frameworks">⚖️</button>
-        <button class="iconbtn" data-act="help" title="Help — how to use & FAQ">❓</button>
-        <button class="iconbtn" data-act="about">ⓘ</button></div></div>`;
+      <div class="icons"><select id="langsel" aria-label="Language" style="width:auto;padding:5px 6px">${langOpts}</select>
+        <button class="iconbtn" data-act="toggleview" aria-label="${state.view==='sim'?'Open advisor tools':'Back to crisis simulator'}" title="${state.view==='sim'?'Advisor tools':'Crisis simulator'}">${state.view==='sim'?'🧰':'🔴'}</button>
+        <button class="iconbtn" data-act="frameworks" aria-label="Regulatory frameworks" title="Regulatory frameworks">⚖️</button>
+        <button class="iconbtn" data-act="help" aria-label="Help — how to use and FAQ" title="Help — how to use & FAQ">❓</button>
+        <button class="iconbtn" data-act="about" aria-label="About and privacy" title="About & privacy">ⓘ</button></div></div>`;
 }
 
 // ---- HERO ----
@@ -728,10 +740,10 @@ function viewRunning(){
     <div class="pad" style="padding:12px 16px 6px"><div class="between"><div class="herobadge">● INJECT ${sim.turns}</div>
       <button class="btn ghost sm" data-act="endsim" ${sim.turns<1||sim.busy?'style="opacity:.4"':''}>End &amp; report →</button></div>
       <div style="height:10px"></div>${owlWidget(sim.busy?'thinking':'alert', owlLineForSim(), true)}</div>
-    <div class="simlog" id="simlog" style="flex:1;overflow-y:auto">${logs}</div>
+    <div class="simlog" id="simlog" aria-live="polite" style="flex:1;overflow-y:auto">${logs}</div>
     <div class="pad" style="padding:10px 14px 12px">
-      <div class="row"><textarea id="decision" rows="3" placeholder="Your decision as the exec team…" ${sim.busy?'disabled':''}></textarea>
-        ${micBtn('decision')}<button class="btn danger" style="width:auto" data-act="decide" ${sim.busy?'disabled':''}>➤</button></div></div>
+      <div class="row"><textarea id="decision" aria-label="Your decision" rows="3" placeholder="Your decision as the exec team…" ${sim.busy?'disabled':''}></textarea>
+        ${micBtn('decision')}<button class="btn danger" style="width:auto" data-act="decide" aria-label="Send decision" ${sim.busy?'disabled':''}>➤</button></div></div>
   </div>`;
 }
 function viewReport(){
@@ -739,7 +751,7 @@ function viewReport(){
     <div class="between"><h2>After-action report</h2><span class="badge"><span class="dot"></span>on-device</span></div>
     <div class="hint" style="margin-top:4px">${esc(owlT().name)} · ${esc(owlT().poweredBy)}</div>
     ${sim.report?`<div class="between" style="margin:12px 0">${owlWidget('happy', owlT().reportReady, true)}${(()=>{const r=(sim.report.match(/(\d{1,3})\s*\/\s*100/)||[])[1];return r?`<div style="text-align:center;flex:0 0 auto">${gaugeCount(r)}<div class="hint" style="margin:2px 0 0">rating</div></div>`:'';})()}</div>`:'<div style="height:12px"></div>'}
-    <div class="report" id="reportbody">${sim.report?fmtReport(sim.report):'<span class="cursor"></span> synthesising…'}</div>
+    <div class="report" id="reportbody" role="region" aria-live="polite" aria-label="Board report">${sim.report?fmtReport(sim.report):'<span class="cursor"></span> synthesising…'}</div>
     <div style="height:14px"></div>
     <div class="row"><button class="btn tonal sm" data-act="restartsim">↻ Run another</button>
       <button class="btn ghost sm" onclick="window.print()">🖨 Print / save</button>${state.voice.enabled?'<button class="btn ghost sm" data-speak="report" data-ref="">🔊 Read</button>':''}</div>
@@ -771,10 +783,10 @@ function viewAssistant(){ const s=S(),p=PILLARS[state.pillar];
   return `<div style="display:flex;flex-direction:column;height:100%">
     <div class="pad" style="padding:12px 16px 8px"><div class="hint">${s.pillar} ${state.pillar+1} ${s.of} ${PILLARS.length} · ${p.title}</div>
       <div class="progress" style="height:6px;border-radius:999px;background:var(--surfaceAlt);overflow:hidden"><i style="display:block;height:100%;background:var(--primary);width:${(state.pillar+1)/PILLARS.length*100}%"></i></div></div>
-    <div class="chatcol" id="achat" style="flex:1;overflow-y:auto">${msgs}</div>
+    <div class="chatcol" id="achat" aria-live="polite" style="flex:1;overflow-y:auto">${msgs}</div>
     <div class="pad" style="padding-top:8px">
-      <div class="row"><textarea id="ans" rows="3" placeholder="${s.answer}" ${state.busy?'disabled':''}></textarea>
-        ${micBtn('ans')}<button class="btn" style="width:auto" data-act="asend" ${state.busy?'disabled':''}>➤</button></div>
+      <div class="row"><textarea id="ans" aria-label="Your answer" rows="3" placeholder="${s.answer}" ${state.busy?'disabled':''}></textarea>
+        ${micBtn('ans')}<button class="btn" style="width:auto" data-act="asend" aria-label="Send answer" ${state.busy?'disabled':''}>➤</button></div>
       <div class="between" style="margin-top:8px"><button class="btn ghost sm" data-act="aadvance" ${state.busy?'disabled':''}>${s.skip}</button>
         <button class="btn tonal sm" data-act="aadvance" ${state.busy?'disabled':''}>${state.pillar<PILLARS.length-1?s.next:s.done} →</button></div></div></div>`;
 }
@@ -790,7 +802,7 @@ function viewScanner(){ const s=S(); let result='';
   const seg=(name,opts)=>`<div class="seg">${opts.map(o=>`<div class="${state[name]==o.v?'sel':''}" data-seg="${name}" data-v="${o.v}">${o.l}</div>`).join('')}</div>`;
   const pack=state.pack?`<div class="report fadein" style="margin-top:14px" id="packbody">${fmtReport(state.pack)}</div>`:'';
   return `<div class="pad fadein"><div class="sub">${s.sIntro}</div><div style="height:12px"></div>
-    <textarea id="inc" rows="7" placeholder="${s.incident}" ${state.busy||state.packBusy?'disabled':''}>${esc(state.incidentText)}</textarea>
+    <textarea id="inc" aria-label="Incident description" rows="7" placeholder="${s.incident}" ${state.busy||state.packBusy?'disabled':''}>${esc(state.incidentText)}</textarea>
     ${state.voice.enabled?`<div style="text-align:right;margin-top:6px">${micBtn('inc','Dictate')}</div>`:''}
     <div style="height:14px"></div><div class="label">${s.likelihood}</div>${seg('likelihood',[{v:1,l:s.low},{v:2,l:s.med},{v:3,l:s.high}])}
     <div style="height:14px"></div><div class="label">${s.control}</div>${seg('control',[{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4'}])}
@@ -801,8 +813,8 @@ function viewScanner(){ const s=S(); let result='';
 }
 function viewTools(){ const s=S();
   const tol=state.tolerances.length? state.tolerances.map((t,i)=>{const objs=[t.rto&&'RTO '+t.rto,t.rpo&&'RPO '+t.rpo,t.mtpd&&'MTPD '+t.mtpd,t.srto&&'SRTO '+t.srto].filter(Boolean);
-    return `<div class="card between"><div><b>${esc(t.service)}</b><div style="margin-top:8px">${objs.length?objs.map(o=>`<span class="tag" style="color:var(--primary);background:#1E6FD91A;border:1px solid #1E6FD955">${esc(o)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="tol" data-i="${i}">🗑</button></div>`}).join('') : `<div class="empty">${s.emptyTol}</div>`;
-  const ven=state.vendors.length? state.vendors.map((v,i)=>`<div class="card between"><div><b>${esc(v.vendor)}</b>${v.service?`<div class="hint" style="margin:2px 0 0">${esc(v.service)}</div>`:''}<div style="margin-top:8px">${(v.nth&&v.nth.length)?v.nth.map(p=>`<span class="tag" style="color:#0A7F73;background:#0FB5A61A;border:1px solid #0FB5A555">${esc(p)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="ven" data-i="${i}">🗑</button></div>`).join('') : `<div class="empty">${s.emptyVen}</div>`;
+    return `<div class="card between"><div><b>${esc(t.service)}</b><div style="margin-top:8px">${objs.length?objs.map(o=>`<span class="tag" style="color:var(--primary);background:#1E6FD91A;border:1px solid #1E6FD955">${esc(o)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="tol" data-i="${i}" aria-label="Remove tolerance">🗑</button></div>`}).join('') : `<div class="empty">${s.emptyTol}</div>`;
+  const ven=state.vendors.length? state.vendors.map((v,i)=>`<div class="card between"><div><b>${esc(v.vendor)}</b>${v.service?`<div class="hint" style="margin:2px 0 0">${esc(v.service)}</div>`:''}<div style="margin-top:8px">${(v.nth&&v.nth.length)?v.nth.map(p=>`<span class="tag" style="color:#0A7F73;background:#0FB5A61A;border:1px solid #0FB5A555">${esc(p)}</span>`).join(''):'<span class="sub">—</span>'}</div></div><button class="iconbtn" data-del="ven" data-i="${i}" aria-label="Remove vendor">🗑</button></div>`).join('') : `<div class="empty">${s.emptyVen}</div>`;
   const risks=concentrationRisks(),acc=risks.length?'var(--warn)':'var(--good)';
   const riskBody=risks.length? risks.map(r=>`<div style="margin-bottom:10px"><div class="row"><span class="tag" style="color:var(--danger);background:#E23D421A;border:1px solid #E23D4255;margin:0">${esc(r.display)}</span><span style="color:var(--danger);font-weight:600;font-size:12px">shared by ${r.vendors.length} vendors</span></div><div class="hint" style="margin-top:4px">${r.vendors.map(esc).join(' · ')}</div></div>`).join('') : `<div class="sub">${s.noconc}</div>`;
   return `<div class="pad fadein"><div class="sechead">⏱️ ${s.tolTitle}</div><div style="height:8px"></div>${tol}
@@ -870,7 +882,8 @@ async function aTurn(userContent, display, expectScore){ const chatEmpty=false;
   if(display) state.messages.push({role:'u',text:userContent}); state.convo.push({role:'user',content:userContent});
   const msg={role:'a',text:'',streaming:true,assessment:null}; state.messages.push(msg); state.busy=true; render(); aScroll();
   const idx=state.messages.length-1; let raw='';
-  try{ raw=await ollamaChat(state.convo,{temperature:expectScore?0.5:0.7,onToken:(t,full)=>{const n=document.querySelector('#amsg-'+idx+' .bubble-text'); if(n)n.textContent=displayText(full); aScroll();}});
+  const paintAns=rafThrottle(full=>{const n=document.querySelector('#amsg-'+idx+' .bubble-text'); if(n)n.textContent=displayText(full); aScroll();});
+  try{ raw=await ollamaChat(state.convo,{temperature:expectScore?0.5:0.7,onToken:(t,full)=>paintAns(full)});
     state.convo.push({role:'assistant',content:raw});
     if(expectScore){const a=extractAssessment(raw); if(a&&a.maturity){msg.assessment=a; state.assessments[PILLARS[state.pillar].id]=a; awardXp(15);}}
     msg.text=displayText(raw)||raw.trim();
@@ -950,6 +963,7 @@ PHONE_MQ.addEventListener('change',()=>{ if(!LS.get('viewmode',null)) setLayout(
   if(saved){setLayout(saved); highlightSel(saved);}
   else {setLayout(autoViewMode()); highlightSel('auto');}
 })();
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&state.modal){ state.modal=null; render(); } });
 render();
 autoConnect();
 checkVoice();
