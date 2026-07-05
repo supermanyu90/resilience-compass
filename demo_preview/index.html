@@ -103,6 +103,10 @@
   .jrow.lock{cursor:default}
   .jcheck{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);flex:0 0 auto;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
   .jcheck.on{background:var(--primary);border-color:var(--primary)}
+  .timeline{margin-top:10px}
+  .tstep{display:flex;gap:10px;padding:7px 0;position:relative}
+  .tstep:not(:last-child):before{content:"";position:absolute;left:11px;top:27px;bottom:-7px;width:2px;background:var(--border)}
+  .tdot{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:0 0 auto;z-index:1}
   .fadein{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   /* Dr. Owl mascot */
   .owl{display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -329,6 +333,26 @@ This is a self-assessment aid, not legal advice.`;}
 function incidentSystemPrompt(){const lang=replyLang(),cats=CATEGORIES.join(', ');
   return `You are Resilience Compass, an incident classifier for banks. Classify the incident into EXACTLY ONE category from: ${cats}.
 Return ONLY a JSON object: {"category":"<one of: ${cats}>","severity":"low|medium|high","impactArea":"<short phrase in ${lang}>","rationale":"<one short sentence in ${lang}>"}`;}
+
+// ---- EU DORA major-incident reporting ----
+function doraActive(){return state.juris.has('dora');}
+function doraSystemPrompt(){const lang=replyLang();
+  return `You assess an operational incident against the EU DORA (Regulation (EU) 2022/2554) major-incident classification criteria: clients/financial counterparts affected; reputational impact; duration and service downtime; geographical spread; data losses; economic impact; and criticality of the services affected. Decide if it is a "major incident" reportable to the competent authority.
+Return ONLY a JSON object: {"major": true, "reason": "<one short sentence in ${lang}>", "criteria": ["<the DORA criteria it triggers, short>"]}`;}
+function doraDeadlines(){const now=new Date(); const add=(d,h)=>new Date(d.getTime()+h*3600e3);
+  const initial=add(now,24), intermediate=add(initial,72); const fin=new Date(intermediate); fin.setMonth(fin.getMonth()+1);
+  const fmt=d=>d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  return [{label:'Initial notification',due:fmt(initial),note:'≤ 24h of awareness (4h of classifying as major)'},
+    {label:'Intermediate report',due:fmt(intermediate),note:'≤ 72h after the initial notification'},
+    {label:'Final report',due:fmt(fin),note:'≤ 1 month after the intermediate report'}];}
+function doraPanel(d){
+  const head=d.major?`<span class="tag" style="color:var(--danger);background:#E23D421A;border:1px solid #E23D4255;margin:0">⚠ Major incident — reportable</span>`
+    :`<span class="tag" style="color:var(--good);background:#16A34A1A;border:1px solid #16A34A55;margin:0">Below major threshold</span>`;
+  const crit=(d.major&&d.criteria&&d.criteria.length)?`<div class="hint" style="margin-top:6px">Triggers: ${d.criteria.map(esc).join(' · ')}</div>`:'';
+  const dl=doraDeadlines();
+  const tl=d.major?`<div class="timeline">${dl.map((s,i)=>`<div class="tstep"><div class="tdot">${i+1}</div><div><div style="font-weight:700;font-size:13px">${s.label} — <span style="color:var(--danger)">${s.due}</span></div><div class="hint" style="margin:2px 0 0">${s.note}</div></div></div>`).join('')}</div><div class="hint" style="margin-top:8px">Indicative deadlines (DORA Art. 19 + RTS on major-incident reporting) — an aid, not legal advice.</div>`:'';
+  return `<div class="card" style="margin-top:12px"><div class="between"><b>🇪🇺 EU DORA — incident reporting</b>${head}</div>${d.reason?`<div class="hint" style="margin-top:8px">${esc(d.reason)}</div>`:''}${crit}${tl}</div>`;
+}
 const ASSESS='[[ASSESSMENT]]';
 function firstJsonObject(s){const st=s.indexOf('{'); if(st<0)return null; let d=0,ins=false,esc2=false;
   for(let i=st;i<s.length;i++){const ch=s[i];
@@ -652,7 +676,7 @@ function viewScanner(){ const s=S(); let result='';
     <div style="height:18px"></div>
     <div class="row"><button class="btn" data-act="analyze" ${state.busy?'disabled':''}>${state.busy?'…':'🛰️ '+s.analyze}</button>
       <button class="btn tonal sm" data-act="genpack" ${state.packBusy?'disabled':''} style="white-space:nowrap">${state.packBusy?'…':'📝 '+s.pack}</button></div>
-    ${result}${pack}</div>`;
+    ${result}${(state.scan&&state.scan.dora)?doraPanel(state.scan.dora):''}${pack}</div>`;
 }
 function viewTools(){ const s=S();
   const tol=state.tolerances.length? state.tolerances.map((t,i)=>{const objs=[t.rto&&'RTO '+t.rto,t.rpo&&'RPO '+t.rpo,t.mtpd&&'MTPD '+t.mtpd,t.srto&&'SRTO '+t.srto].filter(Boolean);
@@ -716,6 +740,7 @@ async function analyze(){ const ta=document.getElementById('inc'); state.inciden
   try{ const raw=await ollamaChat([{role:'system',content:incidentSystemPrompt()},{role:'user',content:state.incidentText}],{json:true,temperature:0.2});
     const cls=extractIncident(raw); if(!cls)throw new Error('Could not parse the classification.');
     state.scan={cls,score:computeScore(cls.severity,state.likelihood,state.control)}; awardXp(15);
+    if(doraActive()){ try{ const dr=await ollamaChat([{role:'system',content:doraSystemPrompt()},{role:'user',content:state.incidentText}],{json:true,temperature:0.2}); const o=firstJsonObject(dr); const dj=o?JSON.parse(o):null; if(dj)state.scan.dora={major:!!dj.major,reason:(dj.reason||'').toString(),criteria:Array.isArray(dj.criteria)?dj.criteria.map(x=>(''+x).trim()).filter(Boolean).slice(0,4):[]}; }catch(e){} }
   }catch(e){ state.scanError=e.message; } state.busy=false; render();
 }
 
