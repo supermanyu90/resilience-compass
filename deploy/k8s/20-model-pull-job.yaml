@@ -21,4 +21,5 @@ spec:
             - |
               echo "waiting for ollama service...";
               until ollama list >/dev/null 2>&1; do sleep 3; done;
-              echo "pulling $MODEL"; ollama pull "$MODEL"; echo "done."
+              echo "pulling $MODEL"; ollama pull "$MODEL";
+              echo "pulling nomic-embed-text (DORA article RAG)"; ollama pull nomic-embed-text; echo "done."

@@ -124,6 +124,7 @@ to the cloud.
 brew install ollama
 ollama serve                 # or: brew services start ollama
 ollama pull gemma3:4b        # snappy (~3 GB). For the bigger model: ollama pull gemma4:12b
+ollama pull nomic-embed-text # DORA article grounding (local RAG, ~274 MB)
 
 # 2) Serve the web app (from the repo root)
 node demo_preview/serve.js
@@ -212,6 +213,13 @@ the license walkthrough, and the `VERIFY`‑at‑build‑time checklist.
 The app preserves the honest distinction that ISO is clause‑numbered while the others are
 principles‑based — and instructs the model never to fabricate a clause number for a principles‑based
 regime.
+
+**DORA grounding (on‑device RAG).** For the EU **DORA**, the BCM Assistant is grounded by a small local
+retrieval step: it embeds the pillar query with `nomic-embed-text` (via Ollama), cosine‑matches it
+against a DORA article knowledge base, and injects the relevant **exact article text** into the prompt —
+so citations use the correct Article numbers (e.g. Art 28 for ICT third‑party risk) rather than
+hallucinated ones. Fully offline. Production upgrade path: **NVIDIA NeMo Retriever + Milvus** (bundled in
+SUSE AI). The Scanner also renders DORA's **major‑incident reporting timeline** (Art 19).
 
 ## How scoring works
 

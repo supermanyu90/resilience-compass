@@ -207,6 +207,27 @@ const JURIS = [
 ];
 const CATEGORIES = ['people','process','technology','third-party','cyber','facilities'];
 const DISCLAIMER = "ISO 22301 (clauses) and the EU DORA — Regulation (EU) 2022/2554 (articles) are precisely numbered; HKMA, MAS, APRA, RBI and the US interagency guidance are principles-based. Resilience Compass is a self-assessment aid — not legal advice or a certification audit — and does not guarantee regulatory compliance.";
+// DORA knowledge base — concise article summaries retrieved (RAG) so citations use the correct Article numbers.
+const DORA_KB = [
+  {art:'Article 5', title:'Governance and organisation', text:'The management body defines, approves, oversees and is accountable for the ICT risk management framework; sets roles, risk tolerance and the business continuity policy.'},
+  {art:'Article 6', title:'ICT risk management framework', text:'A documented, regularly reviewed ICT risk management framework of strategies, policies, procedures and tools to protect information and ICT assets.'},
+  {art:'Article 8', title:'Identification', text:'Identify, classify and document ICT-supported business functions, information and ICT assets, and map dependencies including on ICT third-party providers.'},
+  {art:'Article 9', title:'Protection and prevention', text:'Continuously monitor and control ICT systems; security policies, access control, encryption and network protections to prevent incidents.'},
+  {art:'Article 10', title:'Detection', text:'Mechanisms to promptly detect anomalous activities, ICT incidents and single points of failure, with layered alerting.'},
+  {art:'Article 11', title:'Response and recovery', text:'ICT business continuity policy and response/recovery plans to keep critical functions running, limit damage and resume operations.'},
+  {art:'Article 12', title:'Backup policies and recovery methods', text:'Backup, restoration and recovery procedures with redundant ICT capacity; periodically test backups.'},
+  {art:'Article 13', title:'Learning and evolving', text:'Post-incident reviews and lessons learned feed back into the ICT risk framework; ongoing awareness and training.'},
+  {art:'Article 17', title:'ICT-related incident management process', text:'A process to detect, manage, log and resolve ICT-related incidents with assigned responsibilities.'},
+  {art:'Article 18', title:'Classification of ICT-related incidents', text:'Classify incidents and cyber threats using criteria: clients/counterparts affected, duration, geographical spread, data losses, criticality of services, economic impact — determining major incidents.'},
+  {art:'Article 19', title:'Reporting of major ICT-related incidents', text:'Report major ICT-related incidents to the competent authority via an initial notification, an intermediate report and a final report within the RTS deadlines.'},
+  {art:'Article 24', title:'Digital operational resilience testing (general)', text:'A risk-based digital operational resilience testing programme covering ICT tools and systems.'},
+  {art:'Article 25', title:'Testing of ICT tools and systems', text:'Vulnerability assessments and scans, gap analyses, penetration testing, scenario-based and compatibility testing.'},
+  {art:'Article 26', title:'Threat-led penetration testing (TLPT)', text:'Significant entities carry out advanced threat-led penetration testing at least every three years on critical functions.'},
+  {art:'Article 28', title:'ICT third-party risk — general principles', text:'Manage ICT third-party risk within the framework; maintain a register of information on all contractual arrangements; assess use supporting critical or important functions.'},
+  {art:'Article 29', title:'Preliminary assessment of ICT concentration risk', text:'Assess ICT concentration risk from third-party arrangements, including substitutability and multiple contracts with the same or linked providers.'},
+  {art:'Article 30', title:'Key contractual provisions', text:'Contracts with ICT third-party providers must set service levels, access/audit rights, subcontracting, exit strategies and cooperation with authorities.'},
+  {art:'Article 45', title:'Information-sharing arrangements', text:'Financial entities may exchange cyber threat intelligence within trusted communities to strengthen resilience.'},
+];
 const SEED_TOL = [
   {service:'Retail payments (FPS / UPI)', rto:'2h', rpo:'15m', mtpd:'12h', srto:'4h'},
   {service:'Online & mobile banking', rto:'4h', rpo:'30m', mtpd:'24h', srto:''},
@@ -317,13 +338,13 @@ function groundingFor(pillar){
     return '\n\nThe practitioner has mapped these vendors/Nth-parties — use them directly:\n'+l.join('\n')+rk;}
   return '';
 }
-function bcmSystemPrompt(pillar){const lang=replyLang();
+function bcmSystemPrompt(pillar,doraCtx){const lang=replyLang();
   return `You are Resilience Compass, an expert operational-resilience/BCM advisor for banks. ALWAYS reply in ${lang}. Be concise.
 The practitioner selected these frameworks; cite the relevant one by name and section:
 ${jurisdictionBlock()}
 Rules: ISO 22301 is clause-numbered (cite exact clauses); the others are principles-based (cite the named section, never invent a clause number). Never fabricate a citation.
 You are assessing this pillar:
-"${pillar.title}" — ${pillar.prompt}${groundingFor(pillar)}
+"${pillar.title}" — ${pillar.prompt}${groundingFor(pillar)}${doraCtx||''}
 Maturity scale: 1 Not started, 2 Partially defined, 3 Established & documented, 4 Advanced.
 - If the practitioner DESCRIBES their practice: give a concise evaluation (<=110 words), name the main gap, cite by name. Then on a NEW final line append exactly one tag — valid JSON only, no angle brackets — for example:
 [[ASSESSMENT]] {"maturity": 2, "citations": ["ISO 22301 clause 8.4.2", "APRA CPS 230 (Recovery objectives)"], "rationale": "Recovery objectives exist but are not board-approved."}
@@ -352,6 +373,32 @@ function doraPanel(d){
   const dl=doraDeadlines();
   const tl=d.major?`<div class="timeline">${dl.map((s,i)=>`<div class="tstep"><div class="tdot">${i+1}</div><div><div style="font-weight:700;font-size:13px">${s.label} — <span style="color:var(--danger)">${s.due}</span></div><div class="hint" style="margin:2px 0 0">${s.note}</div></div></div>`).join('')}</div><div class="hint" style="margin-top:8px">Indicative deadlines (DORA Art. 19 + RTS on major-incident reporting) — an aid, not legal advice.</div>`:'';
   return `<div class="card" style="margin-top:12px"><div class="between"><b>🇪🇺 EU DORA — incident reporting</b>${head}</div>${d.reason?`<div class="hint" style="margin-top:8px">${esc(d.reason)}</div>`:''}${crit}${tl}</div>`;
+}
+
+// ---- DORA RAG: retrieve exact article text via local Ollama embeddings (offline) ----
+let DORA_VECS=null;
+async function embed(text){
+  const r=await fetch('/api/embed',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({model:'nomic-embed-text',input:text})});
+  if(!r.ok)throw new Error('embed HTTP '+r.status);
+  const j=await r.json(); return (j.embeddings&&j.embeddings[0])||j.embedding||null;
+}
+function cosine(a,b){let d=0,na=0,nb=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];na+=a[i]*a[i];nb+=b[i]*b[i];}return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9);}
+async function ensureDoraIndex(){
+  if(DORA_VECS)return;
+  const c=LS.get('dora_vecs',null);
+  if(c&&c.n===DORA_KB.length&&c.model==='nomic-embed-text'){DORA_VECS=c.vecs;return;}
+  const vecs=[]; for(const a of DORA_KB){const e=await embed(a.art+' '+a.title+'. '+a.text); if(!e)throw new Error('embed failed'); vecs.push(e);}
+  DORA_VECS=vecs; LS.set('dora_vecs',{n:DORA_KB.length,model:'nomic-embed-text',vecs});
+}
+async function retrieveDora(query,k){
+  await ensureDoraIndex(); const q=await embed(query); if(!q)return [];
+  return DORA_KB.map((a,i)=>({a,s:cosine(q,DORA_VECS[i])})).sort((x,y)=>y.s-x.s).slice(0,k||3).map(x=>x.a);
+}
+async function doraContextFor(query){
+  if(!doraActive())return '';
+  try{ const arts=await retrieveDora(query,3); if(!arts.length)return '';
+    return '\n\nRelevant DORA articles (retrieved from the text — cite these EXACT article numbers when DORA applies; do not invent others):\n'+arts.map(a=>'- '+a.art+' — '+a.title+': '+a.text).join('\n');
+  }catch(e){ return ''; }
 }
 const ASSESS='[[ASSESSMENT]]';
 function firstJsonObject(s){const st=s.indexOf('{'); if(st<0)return null; let d=0,ins=false,esc2=false;
@@ -719,7 +766,8 @@ async function autoConnect(){
 }
 function aScroll(){const c=document.getElementById('achat'); if(c)c.scrollTop=c.scrollHeight;}
 async function openPillar(){ if(state.busy)return; const p=PILLARS[state.pillar];
-  state.messages=[]; state.convo=[{role:'system',content:bcmSystemPrompt(p)}]; state.complete=false; render();
+  const dctx=await doraContextFor(p.title+' '+p.prompt);
+  state.messages=[]; state.convo=[{role:'system',content:bcmSystemPrompt(p,dctx)}]; state.complete=false; render();
   await aTurn('Briefly introduce this pillar in one short sentence, then ask me to describe our current practice. No tag.', false, false);
 }
 async function aTurn(userContent, display, expectScore){ const chatEmpty=false;
