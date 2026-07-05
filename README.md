@@ -15,11 +15,13 @@ and writes the board report — offline.
 - 📶 **Works offline** — put the machine in airplane mode and it keeps answering.
 - 🌍 **6 languages** — English, हिन्दी, 简体中文, Español, Français, Português.
 - 🏛️ **Regulator‑aware** — cites ISO 22301, the EU's **DORA**, HKMA, MAS, APRA, RBI, and the US Fed/OCC/FDIC by name.
+- 🦉 **Guided & gamified** — an animated, multilingual mascot (Dr. Owl) voices Gemma's coaching, with Resilience Points to make the work stick.
 
 ---
 
 ## Table of contents
 - [Partners](#partners)
+- [Impact](#impact)
 - [Why on‑device](#why-on-device)
 - [What it does](#what-it-does)
 - [Two implementations](#two-implementations)
@@ -50,6 +52,25 @@ and writes the board report — offline.
 Local Ollama runs Gemma by default (offline / on‑device); the NVIDIA and Nebius backends share one
 OpenAI‑compatible path in `serve.js`, so switching is just configuration. See
 [Partner deployment](#partner-deployment-suse-k3s--nvidia-nim) and [`deploy/`](deploy/).
+
+## Impact
+
+_(Addresses the hackathon **Impact (25%)** criterion — potential for success, growth, and who it's useful for.)_
+
+Operational resilience is now **mandatory regulation worldwide** — EU **DORA**, APRA **CPS 230**, the UK
+PRA/FCA rules, **RBI**, **HKMA**, **MAS**, and the US **Fed/OCC/FDIC** — yet the data involved (incident
+details, control gaps, vendor dependencies) is too sensitive for cloud AI. So teams still lean on
+spreadsheets and consultants. **Resilience Compass is on‑device AI for a privacy‑critical, heavily‑regulated
+problem** — a direct fit for the **edge / on‑device AI** (and fintech) problem statement.
+
+- **Who it's for:** banks' operational‑resilience, BCM, compliance and risk teams — and, by extension,
+  any regulated enterprise (insurers, healthcare, critical infrastructure).
+- **Why it's useful:** an instant, private, on‑device copilot — the only kind usable on data that can't
+  leave the building. It turns a slow, consultant‑led, spreadsheet process into a live rehearsal + a
+  board‑ready report in seconds.
+- **Long‑term potential & growth:** more jurisdictions, full‑text regulation grounding (RAG), edge
+  deployment at bank branches (**NVIDIA Jetson / SUSE K3s**), team/enterprise features, and expansion
+  beyond banking to every regulated sector — partner‑ready across **NVIDIA · SUSE · Nebius**.
 
 ## Why on‑device
 
@@ -94,6 +115,22 @@ laptop with `gemma3:4b`: ~6 s to the first scenario, ~3 s per turn, ~10 s for th
 ### 👁️ On‑device vision
 On the Crisis Simulator, **"Seed from an architecture diagram"** lets Gemma **read an uploaded image**
 (architecture / vendor diagram) and rebuild your vendor map — perception on‑device, no cloud.
+
+### 🦉 Dr. Owl — a guided, multilingual mascot
+An animated owl mascot **voices Gemma**: it greets you, runs the crisis exercise, and on the advisor tabs
+gives a **live, Gemma‑powered coaching tip** (tap 💡) tuned to the current pillar / incident / vendor
+concentration. Its name and lines are **localised** across all 6 languages (Dr. Owl / Dr. Búho / Dr Hibou /
+猫头鹰博士 / डॉ. उल्लू / Dr. Coruja), and it reacts — thinking, alarmed during the crisis, pleased on the report.
+
+### 🎮 Gamification
+**Resilience Points (XP)** and ranks (Trainee → Chief Resilience Officer) reward doing the work — assessing
+pillars, making crisis decisions, finishing a report, scanning incidents, seeding from a diagram — with a
+level bar and animated "+XP" pops. Progress persists locally. Lowers the barrier to a dry compliance task.
+
+### 🖥️ Interface
+A **frameworks selector** (⚖️) to choose which regulators apply; a **Help** modal (❓) with *How to Use* and
+*FAQ*; a clean **light theme**; and a **responsive layout** that **auto‑picks desktop vs mobile by screen
+size**, with a manual Desktop / Mobile / Auto switch.
 
 Everything persists locally only (browser `localStorage` / on‑device storage), never synced.
 
@@ -241,11 +278,17 @@ how many vendors share it.
 
 ```
 resilience_compass_mobile/
-├─ demo_preview/            # Real-Gemma web demo (this is the live localhost artifact)
-│  ├─ index.html            #   Hero-first UI: Crisis Simulator + advisor toolkit + on-device vision + Ollama
-│  └─ serve.js              #   Zero-dep Node static server + streaming Ollama reverse-proxy
+├─ demo_preview/            # Real-Gemma web demo — the live localhost artifact
+│  ├─ index.html            #   Crisis Simulator + advisor toolkit + Dr. Owl + gamification + DORA RAG/timeline,
+│  │                        #   frameworks/help/impact, light theme, responsive desktop/mobile
+│  └─ serve.js              #   Zero-dep Node static server + backend-agnostic model proxy (Ollama or NIM/Nebius)
+├─ deploy/                  # SUSE K3s deployment
+│  ├─ Dockerfile            #   web app image
+│  ├─ k8s/                  #   namespace, Ollama + model-pull Job, webapp, Traefik ingress
+│  ├─ k8s/nim/              #   optional NVIDIA NIM (GPU) variant
+│  └─ README.md             #   build → import → apply; NIM / Nebius / NeuVector notes
 ├─ lib/                     # Flutter app
-│  ├─ data/framework_data.dart      # 10 pillars, 6 jurisdictions, categories, disclaimer
+│  ├─ data/framework_data.dart      # 10 pillars, 7 jurisdictions (incl. DORA), categories, disclaimer
 │  ├─ i18n/strings.dart             # 6-language UI table
 │  ├─ models/                       # app_state, chat_message, assessment, incident, tools, tools_state
 │  ├─ services/                     # gemma_service (SDK-isolated), prompt_builder, json_extractor, scoring, persistence
@@ -283,6 +326,10 @@ resilience_compass_mobile/
 - ✅ Web demo with **real local Gemma** — verified end‑to‑end: the **Crisis Simulator** (grounded scenario
   → adaptive injects → regulator‑cited coaching → after‑action board report), on‑device **vision** seeding,
   BCM evaluation with citations + maturity, incident JSON classification, and grounded concentration risk.
+- ✅ **UX & extras** — Dr. Owl mascot (multilingual, Gemma‑powered tips), gamification (Resilience Points),
+  **DORA** article‑grounded citations + major‑incident reporting timeline, frameworks selector, Help/FAQ,
+  light theme, and a responsive desktop/mobile layout.
+- ✅ **Partner paths** — NIM‑compatible `serve.js` (NVIDIA / Nebius) + SUSE K3s manifests, all verified.
 - ✅ Flutter app — code‑complete across setup, assistant, scanner, tools, about.
 - ⏳ Compile & run the Flutter app on a device once a toolchain is available.
 - ⏳ Optional: port the original web prototype's fact‑checked dataset verbatim if provided.
