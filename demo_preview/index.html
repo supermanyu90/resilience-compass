@@ -143,7 +143,8 @@
   .impact-list li{margin-bottom:6px}
   .impact-list b{color:var(--text)}
   .micbtn,.spkbtn{border:1px solid var(--border);background:var(--surface);color:var(--textSec);border-radius:12px;cursor:pointer;flex:0 0 auto}
-  .micbtn{font-size:16px;padding:0 12px;align-self:stretch}
+  .micbtn{font-size:16px;padding:6px 12px;align-self:stretch}
+  .micbtn.labeled{font-size:13px;font-weight:600;align-self:center}
   .micbtn.rec{background:var(--danger);color:#fff;border-color:var(--danger);animation:recpulse 1s ease-in-out infinite}
   @keyframes recpulse{0%,100%{box-shadow:0 0 0 0 rgba(226,61,66,.5)}50%{box-shadow:0 0 0 6px rgba(226,61,66,0)}}
   .spkbtn{font-size:11px;padding:2px 7px;border-radius:8px;margin-left:8px;vertical-align:middle}
@@ -649,7 +650,7 @@ async function genPack(){
 // ================= views =================
 // ---- Voice: Gradium STT (mic) + TTS (speaker), routed through serve.js (key server-side) ----
 async function checkVoice(){ try{ const r=await fetch('/gradium/status'); state.voice={enabled:!!(await r.json()).enabled}; if(state.voice.enabled)render(); }catch(e){ state.voice={enabled:false}; } }
-function micBtn(id){ return state.voice.enabled?`<button class="micbtn" data-mic="${id}" title="Speak your answer (voice via Gradium)">🎤</button>`:''; }
+function micBtn(id,label){ return state.voice.enabled?`<button class="micbtn${label?' labeled':''}" data-mic="${id}" title="Dictate (voice via Gradium)">🎤${label?' '+esc(label):''}</button>`:''; }
 function speakBtn(kind,ref){ return state.voice.enabled?`<button class="spkbtn" data-speak="${kind}" data-ref="${ref}" title="Read aloud (voice via Gradium)">🔊</button>`:''; }
 let _mediaRec=null,_recChunks=[],_recTarget=null;
 async function toggleDictate(id){
@@ -817,6 +818,7 @@ function viewScanner(){ const s=S(); let result='';
   const pack=state.pack?`<div class="report fadein" style="margin-top:14px" id="packbody">${fmtReport(state.pack)}</div>`:'';
   return `<div class="pad fadein"><div class="sub">${s.sIntro}</div><div style="height:12px"></div>
     <textarea id="inc" rows="4" placeholder="${s.incident}" ${state.busy||state.packBusy?'disabled':''}>${esc(state.incidentText)}</textarea>
+    ${state.voice.enabled?`<div style="text-align:right;margin-top:6px">${micBtn('inc','Dictate')}</div>`:''}
     <div style="height:14px"></div><div class="label">${s.likelihood}</div>${seg('likelihood',[{v:1,l:s.low},{v:2,l:s.med},{v:3,l:s.high}])}
     <div style="height:14px"></div><div class="label">${s.control}</div>${seg('control',[{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4'}])}
     <div style="height:18px"></div>
