@@ -250,9 +250,9 @@ function serveStatic(req, res) {
   const filePath = path.normalize(path.join(ROOT, rel));
   // confine strictly to ROOT (avoid the sibling-prefix escape of a bare startsWith(ROOT))
   if (filePath !== ROOT && !filePath.startsWith(ROOT + path.sep)) { res.writeHead(403); return res.end('forbidden'); }
-  // serve only known web assets; never the server script, tests, manifests or dotfiles
-  const base = path.basename(filePath);
-  if (!TYPES[path.extname(filePath)] || base === 'serve.js' || /\.test\.js$/.test(base) || base.startsWith('.') || /^package(-lock)?\.json$/.test(base)) {
+  // serve only known web assets; among scripts only logic.js; never server/test/dev scripts, manifests or dotfiles
+  const base = path.basename(filePath), ext = path.extname(filePath);
+  if (!TYPES[ext] || base.startsWith('.') || /^package(-lock)?\.json$/.test(base) || (ext === '.js' && base !== 'logic.js')) {
     res.writeHead(404); return res.end('not found');
   }
   fs.readFile(filePath, (err, data) => {

@@ -340,6 +340,7 @@ const el = document.getElementById('app');
 const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // coalesce rapid streaming updates to at most one DOM write per animation frame
 function rafThrottle(fn){let pending=false,last;return a=>{last=a;if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;fn(last);});};}
+let _returnFocus=null; // element to refocus when a modal closes
 const matColor = m => m>=4?'#16A34A':m===3?'#1E6FD9':m===2?'#E0900C':'#E23D42';
 const bandColor = s => s>=67?'#16A34A':s>=34?'#E0900C':'#E23D42';
 function activeJuris(){return JURIS.filter(j=>j.always||state.juris.has(j.id))}
@@ -667,7 +668,9 @@ async function speak(text,btn){ if(!state.voice.enabled||!text)return;
 
 function render(){ el.innerHTML=viewShell();
   if(state.modal){ el.insertAdjacentHTML('beforeend',state.modal);
-    const sh=el.querySelector('.modal .sheet'); if(sh){ sh.setAttribute('role','dialog'); sh.setAttribute('aria-modal','true'); sh.setAttribute('tabindex','-1'); sh.focus(); } }
+    const sh=el.querySelector('.modal .sheet'); if(sh){ sh.setAttribute('role','dialog'); sh.setAttribute('aria-modal','true'); sh.setAttribute('tabindex','-1'); sh.focus();
+      sh.onkeydown=e=>{ if(e.key!=='Tab')return; const f=[...sh.querySelectorAll('button,select,textarea,input,[href],[tabindex]:not([tabindex="-1"])')].filter(x=>!x.disabled); if(f.length<2)return; const first=f[0],last=f[f.length-1];
+        if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();} else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();} }; } }
   document.documentElement.lang=state.lang;
   bind();
 }
@@ -919,9 +922,16 @@ function bind(){
     else if(k==='owl'){text=state.owlTip[state.advTab]||'';}
     else if(k==='report'){text=sim.report||'';}
     speak(text,b);});
+  // keyboard operability for clickable non-button controls (advisor tabs, scanner segments, framework rows, help tabs)
+  el.querySelectorAll('[data-adv],[data-seg],[data-jtoggle],[data-helptab]').forEach(n=>{
+    if(n.tagName==='BUTTON'||n.tagName==='A')return;
+    n.setAttribute('tabindex','0'); if(!n.getAttribute('role'))n.setAttribute('role','button');
+    n.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); n.click(); } };
+  });
   el.querySelectorAll('[data-countup]').forEach(n=>{const to=+n.dataset.countup||0; let cur=0; const step=Math.max(1,Math.round(to/35)); const iv=setInterval(()=>{cur+=step; if(cur>=to){cur=to;clearInterval(iv);} n.textContent=cur;},26);});
 }
-function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
+function act(a){ if(['frameworks','help','about'].includes(a)&&!state.modal)_returnFocus=document.activeElement;
+  const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
   switch(a){
     case'toggleview': state.view=state.view==='sim'?'advisor':'sim'; render();
       if(state.view==='advisor'){ if(state.advTab==='assistant'&&!state.messages.length&&!state.complete&&!state.busy)openPillar();
@@ -931,7 +941,7 @@ function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.val
     case'frameworks': state.modal=frameworksModal(); render(); break;
     case'help': state.helpTab='howto'; state.modal=helpModal(); render(); break;
     case'about': state.modal=aboutModal(); render(); break;
-    case'closemodal': state.modal=null; render(); break;
+    case'closemodal': state.modal=null; render(); if(_returnFocus&&_returnFocus.focus)_returnFocus.focus(); _returnFocus=null; break;
     case'simstart': startSim(); break;
     case'decide': submitDecision(); break;
     case'endsim': endSim(); break;
@@ -963,7 +973,7 @@ PHONE_MQ.addEventListener('change',()=>{ if(!LS.get('viewmode',null)) setLayout(
   if(saved){setLayout(saved); highlightSel(saved);}
   else {setLayout(autoViewMode()); highlightSel('auto');}
 })();
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&state.modal){ state.modal=null; render(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&state.modal){ state.modal=null; render(); if(_returnFocus&&_returnFocus.focus)_returnFocus.focus(); _returnFocus=null; } });
 render();
 autoConnect();
 checkVoice();
