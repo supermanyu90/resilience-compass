@@ -182,7 +182,7 @@
   @keyframes needle{0%,100%{transform:rotate(-11deg)}50%{transform:rotate(11deg)}}
   .brandtext{line-height:1;min-width:0}
   .wordmark{font-weight:800;font-size:19px;letter-spacing:.01em;background:linear-gradient(90deg,#1E6FD9 0%,#0FB5A6 100%);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
-  .brandtag{font-size:9px;letter-spacing:.2em;color:var(--textSec);font-weight:700;margin-top:3px}
+  .brandtag{font-size:10px;letter-spacing:.16em;color:var(--textSec);font-weight:700}
   .xpchip{flex:0 0 auto;min-width:118px;text-align:right}
   .xprow{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:12px;font-weight:800;color:#134a95}
   .xpbar{height:5px;border-radius:999px;background:var(--surfaceAlt);overflow:hidden;margin:4px 0 2px}
@@ -638,7 +638,7 @@ function header(){
   const langOpts=Object.entries(LANGS).map(([k,v])=>`<option value="${k}" ${state.lang===k?'selected':''}>${v}</option>`).join('');
   const g=xpProgress(state.xp);
   return `<div class="brandbar">
-      <div class="brand">${compassSvg()}<div class="brandtext"><div class="wordmark">Resilience Compass</div><div class="brandtag">OPERATIONAL RESILIENCE</div></div></div>
+      <div class="brand">${compassSvg()}<div class="brandtag">OPERATIONAL RESILIENCE</div></div>
       <div class="xpchip" title="${esc(g.name)} · ${state.xp} XP">
         <div class="xprow"><span>⭐</span><span>${esc(g.name)}</span></div>
         <div class="xpbar"><i style="width:${g.pct}%"></i></div>
