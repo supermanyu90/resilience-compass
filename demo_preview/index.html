@@ -757,7 +757,7 @@ function viewRunning(){
       <div style="height:10px"></div>${owlWidget(sim.busy?'thinking':'alert', owlLineForSim(), true)}</div>
     <div class="simlog" id="simlog" style="flex:1;overflow-y:auto">${logs}</div>
     <div class="pad" style="padding:10px 14px 12px">
-      <div class="row"><textarea id="decision" rows="1" placeholder="Your decision as the exec team…" ${sim.busy?'disabled':''}></textarea>
+      <div class="row"><textarea id="decision" rows="3" placeholder="Your decision as the exec team…" ${sim.busy?'disabled':''}></textarea>
         ${micBtn('decision')}<button class="btn danger" style="width:auto" data-act="decide" ${sim.busy?'disabled':''}>➤</button></div></div>
   </div>`;
 }
@@ -800,7 +800,7 @@ function viewAssistant(){ const s=S(),p=PILLARS[state.pillar];
       <div class="progress" style="height:6px;border-radius:999px;background:var(--surfaceAlt);overflow:hidden"><i style="display:block;height:100%;background:var(--primary);width:${(state.pillar+1)/PILLARS.length*100}%"></i></div></div>
     <div class="chatcol" id="achat" style="flex:1;overflow-y:auto">${msgs}</div>
     <div class="pad" style="padding-top:8px">
-      <div class="row"><textarea id="ans" rows="1" placeholder="${s.answer}" ${state.busy?'disabled':''}></textarea>
+      <div class="row"><textarea id="ans" rows="3" placeholder="${s.answer}" ${state.busy?'disabled':''}></textarea>
         ${micBtn('ans')}<button class="btn" style="width:auto" data-act="asend" ${state.busy?'disabled':''}>➤</button></div>
       <div class="between" style="margin-top:8px"><button class="btn ghost sm" data-act="aadvance" ${state.busy?'disabled':''}>${s.skip}</button>
         <button class="btn tonal sm" data-act="aadvance" ${state.busy?'disabled':''}>${state.pillar<PILLARS.length-1?s.next:s.done} →</button></div></div></div>`;
@@ -817,7 +817,7 @@ function viewScanner(){ const s=S(); let result='';
   const seg=(name,opts)=>`<div class="seg">${opts.map(o=>`<div class="${state[name]==o.v?'sel':''}" data-seg="${name}" data-v="${o.v}">${o.l}</div>`).join('')}</div>`;
   const pack=state.pack?`<div class="report fadein" style="margin-top:14px" id="packbody">${fmtReport(state.pack)}</div>`:'';
   return `<div class="pad fadein"><div class="sub">${s.sIntro}</div><div style="height:12px"></div>
-    <textarea id="inc" rows="4" placeholder="${s.incident}" ${state.busy||state.packBusy?'disabled':''}>${esc(state.incidentText)}</textarea>
+    <textarea id="inc" rows="7" placeholder="${s.incident}" ${state.busy||state.packBusy?'disabled':''}>${esc(state.incidentText)}</textarea>
     ${state.voice.enabled?`<div style="text-align:right;margin-top:6px">${micBtn('inc','Dictate')}</div>`:''}
     <div style="height:14px"></div><div class="label">${s.likelihood}</div>${seg('likelihood',[{v:1,l:s.low},{v:2,l:s.med},{v:3,l:s.high}])}
     <div style="height:14px"></div><div class="label">${s.control}</div>${seg('control',[{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4'}])}
