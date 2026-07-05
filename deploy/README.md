@@ -95,6 +95,6 @@ NeuVector then gives runtime zero-trust protection for the banking workload — 
 includes security.
 
 ## Notes
-- `serve.js` env: `MODEL_BACKEND` (`ollama`|`openai`), `OLLAMA_URL`, `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `MODEL_ID`, `PORT`.
+- `serve.js` env: `MODEL_BACKEND` (`ollama`|`openai`), `OLLAMA_URL`, `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `MODEL_ID`, `PORT`, and optional `GRADIUM_API_KEY` (voice STT/TTS — a cloud tier; provide via a Kubernetes Secret, never in the image or git).
 - Everything is local to the cluster — pull the model once, then it runs offline (airplane-mode friendly).
 - GPU is optional for Ollama; **required** for NIM.

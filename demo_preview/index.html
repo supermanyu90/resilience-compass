@@ -142,6 +142,12 @@
   .impact-list{margin:8px 0 0;padding-left:18px;font-size:12.5px;line-height:1.5;color:var(--textSec)}
   .impact-list li{margin-bottom:6px}
   .impact-list b{color:var(--text)}
+  .micbtn,.spkbtn{border:1px solid var(--border);background:var(--surface);color:var(--textSec);border-radius:12px;cursor:pointer;flex:0 0 auto}
+  .micbtn{font-size:16px;padding:0 12px;align-self:stretch}
+  .micbtn.rec{background:var(--danger);color:#fff;border-color:var(--danger);animation:recpulse 1s ease-in-out infinite}
+  @keyframes recpulse{0%,100%{box-shadow:0 0 0 0 rgba(226,61,66,.5)}50%{box-shadow:0 0 0 6px rgba(226,61,66,0)}}
+  .spkbtn{font-size:11px;padding:2px 7px;border-radius:8px;margin-left:8px;vertical-align:middle}
+  .spkbtn.playing{background:var(--primary);color:#fff;border-color:var(--primary)}
   .fadein{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   /* Dr. Owl mascot */
   .owl{display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -317,6 +323,7 @@ const state = {
   owlTip:{assistant:'',scanner:'',tools:'',busy:false},
   xp: LS.get('xp',0),
   helpTab:'howto',
+  voice:{enabled:false},
   modal:null,
 };
 state.juris.add('iso22301');
@@ -568,7 +575,7 @@ function helperOwl(tab){
   const line=busy?owlT().thinking:(t[tab]||defaultTip(tab));
   const disabled=(busy||state.busy)?'disabled':'';
   const btn=`<button class="iconbtn" data-act="owltip" title="${esc(owlT().name)} · Gemma" ${disabled}>${busy?'…':(t[tab]?'↻':'💡')}</button>`;
-  return `<div class="owlhelper">${owlWidget(busy?'thinking':'idle', line, true)}${btn}</div>`;
+  return `<div class="owlhelper">${owlWidget(busy?'thinking':'idle', line, true)}${btn}${(!busy&&t[tab])?speakBtn('owl',''):''}</div>`;
 }
 async function fetchOwlTip(tab){
   if(state.owlTip.busy||state.busy||state.modelStatus!=='ready')return;
@@ -640,6 +647,43 @@ async function genPack(){
 }
 
 // ================= views =================
+// ---- Voice: Gradium STT (mic) + TTS (speaker), routed through serve.js (key server-side) ----
+async function checkVoice(){ try{ const r=await fetch('/gradium/status'); state.voice={enabled:!!(await r.json()).enabled}; if(state.voice.enabled)render(); }catch(e){ state.voice={enabled:false}; } }
+function micBtn(id){ return state.voice.enabled?`<button class="micbtn" data-mic="${id}" title="Speak your answer (voice via Gradium)">🎤</button>`:''; }
+function speakBtn(kind,ref){ return state.voice.enabled?`<button class="spkbtn" data-speak="${kind}" data-ref="${ref}" title="Read aloud (voice via Gradium)">🔊</button>`:''; }
+let _mediaRec=null,_recChunks=[],_recTarget=null;
+async function toggleDictate(id){
+  if(!state.voice.enabled)return;
+  if(_mediaRec&&_mediaRec.state==='recording'){ _mediaRec.stop(); return; }
+  let stream; try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }catch(e){ alert('Microphone permission is needed for voice input.'); return; }
+  _recChunks=[]; _recTarget=id; _mediaRec=new MediaRecorder(stream);
+  _mediaRec.ondataavailable=e=>{ if(e.data&&e.data.size)_recChunks.push(e.data); };
+  _mediaRec.onstop=async()=>{ stream.getTracks().forEach(t=>t.stop()); setRecUI(false);
+    try{ const wav=await blobToWav(new Blob(_recChunks,{type:(_mediaRec&&_mediaRec.mimeType)||'audio/webm'}));
+      const r=await fetch('/gradium/stt',{method:'POST',headers:{'content-type':'audio/wav'},body:wav});
+      const text=((await r.json()).text||'').trim();
+      const el2=document.getElementById(_recTarget); if(el2&&text){ el2.value=(el2.value?el2.value+' ':'')+text; el2.focus(); }
+    }catch(e){ console.error('stt',e); } };
+  _mediaRec.start(); setRecUI(true);
+}
+function setRecUI(on){ document.querySelectorAll('[data-mic]').forEach(b=>b.classList.toggle('rec', on && b.dataset.mic===_recTarget)); }
+async function blobToWav(blob){ const ac=new (window.AudioContext||window.webkitAudioContext)(); const audio=await ac.decodeAudioData(await blob.arrayBuffer()); ac.close(); return encodeWav(audio); }
+function encodeWav(audioBuffer){ const sr=audioBuffer.sampleRate, ch=audioBuffer.getChannelData(0), len=ch.length;
+  const b=new ArrayBuffer(44+len*2), v=new DataView(b); const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  w(0,'RIFF'); v.setUint32(4,36+len*2,true); w(8,'WAVE'); w(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,'data'); v.setUint32(40,len*2,true);
+  let o=44; for(let i=0;i<len;i++){ let s=Math.max(-1,Math.min(1,ch[i])); v.setInt16(o,s<0?s*0x8000:s*0x7FFF,true); o+=2; }
+  return new Blob([v],{type:'audio/wav'}); }
+let _ttsAudio=null;
+async function speak(text,btn){ if(!state.voice.enabled||!text)return;
+  if(_ttsAudio){ try{_ttsAudio.pause();}catch(e){} _ttsAudio=null; }
+  if(btn)btn.classList.add('playing');
+  try{ const r=await fetch('/gradium/tts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text:text.slice(0,1500)})});
+    if(!r.ok)throw new Error('tts '+r.status); const url=URL.createObjectURL(await r.blob());
+    _ttsAudio=new Audio(url); _ttsAudio.onended=()=>{ if(btn)btn.classList.remove('playing'); URL.revokeObjectURL(url); };
+    _ttsAudio.onerror=()=>{ if(btn)btn.classList.remove('playing'); }; await _ttsAudio.play();
+  }catch(e){ if(btn)btn.classList.remove('playing'); console.error('tts',e); } }
+
 function render(){ el.innerHTML=viewShell(); if(state.modal)el.insertAdjacentHTML('beforeend',state.modal); bind(); }
 function viewShell(){ return header()+`<div class="body2">${state.view==='sim'?viewSim():viewAdvisor()}</div>`; }
 function header(){
@@ -705,7 +749,7 @@ function viewIntro(){
 }
 function viewRunning(){
   const logs=sim.log.map((m,i)=>{ if(m.role==='dec')return `<div class="dec">${esc(m.text)}</div>`;
-    return `<div class="fac" id="log-${i}">${m.text?fmtFacDisplay(m.text):'<span class="cursor"></span>'}</div>`; }).join('');
+    return `<div class="fac" id="log-${i}">${m.text?fmtFacDisplay(m.text):'<span class="cursor"></span>'}${m.text?speakBtn('fac',i):''}</div>`; }).join('');
   return `<div style="display:flex;flex-direction:column;height:100%">
     <div class="pad" style="padding:12px 16px 6px"><div class="between"><div class="herobadge">● INJECT ${sim.turns}</div>
       <button class="btn ghost sm" data-act="endsim" ${sim.turns<1||sim.busy?'style="opacity:.4"':''}>End &amp; report →</button></div>
@@ -713,7 +757,7 @@ function viewRunning(){
     <div class="simlog" id="simlog" style="flex:1;overflow-y:auto">${logs}</div>
     <div class="pad" style="padding:10px 14px 12px">
       <div class="row"><textarea id="decision" rows="1" placeholder="Your decision as the exec team…" ${sim.busy?'disabled':''}></textarea>
-        <button class="btn danger" style="width:auto" data-act="decide" ${sim.busy?'disabled':''}>➤</button></div></div>
+        ${micBtn('decision')}<button class="btn danger" style="width:auto" data-act="decide" ${sim.busy?'disabled':''}>➤</button></div></div>
   </div>`;
 }
 function viewReport(){
@@ -724,7 +768,7 @@ function viewReport(){
     <div class="report" id="reportbody">${sim.report?fmtReport(sim.report):'<span class="cursor"></span> synthesising…'}</div>
     <div style="height:14px"></div>
     <div class="row"><button class="btn tonal sm" data-act="restartsim">↻ Run another</button>
-      <button class="btn ghost sm" onclick="window.print()">🖨 Print / save</button></div>
+      <button class="btn ghost sm" onclick="window.print()">🖨 Print / save</button>${state.voice.enabled?'<button class="btn ghost sm" data-speak="report" data-ref="">🔊 Read</button>':''}</div>
   </div>`;
 }
 
@@ -756,7 +800,7 @@ function viewAssistant(){ const s=S(),p=PILLARS[state.pillar];
     <div class="chatcol" id="achat" style="flex:1;overflow-y:auto">${msgs}</div>
     <div class="pad" style="padding-top:8px">
       <div class="row"><textarea id="ans" rows="1" placeholder="${s.answer}" ${state.busy?'disabled':''}></textarea>
-        <button class="btn" style="width:auto" data-act="asend" ${state.busy?'disabled':''}>➤</button></div>
+        ${micBtn('ans')}<button class="btn" style="width:auto" data-act="asend" ${state.busy?'disabled':''}>➤</button></div>
       <div class="between" style="margin-top:8px"><button class="btn ghost sm" data-act="aadvance" ${state.busy?'disabled':''}>${s.skip}</button>
         <button class="btn tonal sm" data-act="aadvance" ${state.busy?'disabled':''}>${state.pillar<PILLARS.length-1?s.next:s.done} →</button></div></div></div>`;
 }
@@ -829,6 +873,7 @@ function helpFAQ(){return `<div class="faq">
   <div class="qa"><div class="q">Is this legal or compliance advice?</div><div class="a">No — a self-assessment aid, not legal advice or a certification audit. Always verify against primary sources.</div></div>
   <div class="qa"><div class="q">Can it run on a phone / offline?</div><div class="a">Yes — built for the edge (a Flutter mobile build exists) and works offline after the model loads.</div></div>
   <div class="qa"><div class="q">Which model, and can I change it?</div><div class="a">Gemma (default gemma3:4b via Ollama). Pluggable to NVIDIA NIM or Nebius AI Studio via one config — same OpenAI-compatible interface.</div></div>
+  <div class="qa"><div class="q">Is voice input on-device too?</div><div class="a">No — speech-to-text and text-to-speech use the Gradium cloud API and are optional/opt-in (the 🎤 / 🔊 buttons). The compliance reasoning (Gemma) stays fully on-device; avoid dictating truly sensitive incident text.</div></div>
 </div>`;}
 
 // ================= advisor behaviour =================
@@ -880,6 +925,12 @@ function bind(){
   el.querySelectorAll('[data-act]').forEach(n=>n.onclick=()=>act(n.dataset.act));
   el.querySelectorAll('[data-jtoggle]').forEach(n=>n.onclick=()=>toggleJuris(n.dataset.jtoggle));
   el.querySelectorAll('[data-helptab]').forEach(n=>n.onclick=()=>{state.helpTab=n.dataset.helptab; state.modal=helpModal(); render();});
+  el.querySelectorAll('[data-mic]').forEach(b=>b.onclick=()=>toggleDictate(b.dataset.mic));
+  el.querySelectorAll('[data-speak]').forEach(b=>b.onclick=()=>{const k=b.dataset.speak;let text='';
+    if(k==='fac'){const i=+b.dataset.ref;text=(sim.log[i]&&sim.log[i].text)||'';}
+    else if(k==='owl'){text=state.owlTip[state.advTab]||'';}
+    else if(k==='report'){text=sim.report||'';}
+    speak(text,b);});
   el.querySelectorAll('[data-countup]').forEach(n=>{const to=+n.dataset.countup||0; let cur=0; const step=Math.max(1,Math.round(to/35)); const iv=setInterval(()=>{cur+=step; if(cur>=to){cur=to;clearInterval(iv);} n.textContent=cur;},26);});
 }
 function act(a){ const g=id=>{const x=document.getElementById(id);return x?x.value.trim():''};
@@ -926,6 +977,7 @@ PHONE_MQ.addEventListener('change',()=>{ if(!LS.get('viewmode',null)) setLayout(
 })();
 render();
 autoConnect();
+checkVoice();
 </script>
 </body>
 </html>

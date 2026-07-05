@@ -132,6 +132,12 @@ A **frameworks selector** (⚖️) to choose which regulators apply; a **Help** 
 *FAQ*; a clean **light theme**; and a **responsive layout** that **auto‑picks desktop vs mobile by screen
 size**, with a manual Desktop / Mobile / Auto switch.
 
+### 🎤 Voice (opt‑in)
+🎤 **dictate your answers** and 🔊 **hear** Gemma's coaching / crisis injects / board report read aloud,
+via **Gradium** speech‑to‑text & text‑to‑speech. Voice is a **cloud tier** (STT/TTS), so it's optional and
+off by default — the **compliance reasoning (Gemma) stays on‑device**. Enable by starting the server with
+`GRADIUM_API_KEY` set; the key is proxied **server‑side** and never exposed to the browser.
+
 Everything persists locally only (browser `localStorage` / on‑device storage), never synced.
 
 ## Two implementations
@@ -166,6 +172,8 @@ ollama pull nomic-embed-text # DORA article grounding (local RAG, ~274 MB)
 # 2) Serve the web app (from the repo root)
 node demo_preview/serve.js
 #    → Resilience Compass demo → http://localhost:8422
+# (optional) enable voice I/O — Gradium cloud STT/TTS (key proxied server-side, never committed):
+#   GRADIUM_API_KEY=your_key node demo_preview/serve.js
 ```
 Open **http://localhost:8422** in Chrome. It **auto‑connects** to the local model (the header shows a
 `gemma3:4b` chip once warm) and lands on the **Crisis Simulator** — press **Start the exercise**. Tap 🧰

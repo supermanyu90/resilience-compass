@@ -16,6 +16,8 @@
 //   OPENAI_BASE_URL  default http://127.0.0.1:8000/v1   (local NVIDIA NIM; or https://api.studio.nebius.com/v1)
 //   OPENAI_API_KEY   optional Bearer token (e.g. NGC key / build.nvidia.com)
 //   MODEL_ID         optional fallback model id for the openai backend
+//   GRADIUM_API_KEY  optional — enables the voice tier (Gradium STT/TTS); unset = voice buttons hidden
+//   GRADIUM_VOICE_ID optional TTS voice id (default a library voice)
 //
 // All inference still runs on whatever host the backend points at — keep it local (on-prem NIM /
 // Jetson / Ollama) to preserve the offline, on-device story.
@@ -34,6 +36,11 @@ const OPENAI_BASE = (process.env.OPENAI_BASE_URL || 'http://127.0.0.1:8000/v1').
 const OPENAI_KEY = process.env.OPENAI_API_KEY || '';
 const DEFAULT_MODEL = process.env.MODEL_ID || '';
 
+// Optional voice tier (Gradium STT/TTS). Cloud service — key stays server-side, never in the browser.
+const GRADIUM_KEY = process.env.GRADIUM_API_KEY || '';
+const GRADIUM_BASE = (process.env.GRADIUM_BASE_URL || 'https://api.gradium.ai/api').replace(/\/+$/, '');
+const GRADIUM_VOICE = process.env.GRADIUM_VOICE_ID || 'YTpq7expH9539ERJ';
+
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8',
@@ -43,11 +50,70 @@ const modFor = (u) => (u.protocol === 'https:' ? https : http);
 const NDJSON = { 'content-type': 'application/x-ndjson', 'cache-control': 'no-cache' };
 
 const server = http.createServer((req, res) => {
+  if (req.url.startsWith('/gradium/')) return handleGradium(req, res);
   if (req.url.startsWith('/api/')) {
     return BACKEND === 'openai' ? handleOpenAI(req, res) : handleOllama(req, res);
   }
   serveStatic(req, res);
 });
+
+// ---------- Voice: Gradium STT/TTS proxy (key server-side) ----------
+function handleGradium(req, res) {
+  const p = req.url.split('?')[0];
+  if (p === '/gradium/status') { // lets the UI show voice buttons only when configured
+    res.writeHead(200, { 'content-type': 'application/json' });
+    return res.end(JSON.stringify({ enabled: !!GRADIUM_KEY }));
+  }
+  if (!GRADIUM_KEY) { res.writeHead(503, { 'content-type': 'application/json' });
+    return res.end(JSON.stringify({ error: 'voice not configured (set GRADIUM_API_KEY)' })); }
+  if (req.method === 'POST' && p === '/gradium/tts') return gradiumTTS(req, res);
+  if (req.method === 'POST' && p === '/gradium/stt') return gradiumSTT(req, res);
+  res.writeHead(404, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: 'unknown voice route' }));
+}
+
+// text -> speech (returns audio/wav bytes)
+function gradiumTTS(req, res) {
+  let raw = '';
+  req.on('data', (c) => (raw += c));
+  req.on('end', () => {
+    let text = '';
+    try { text = (JSON.parse(raw || '{}').text || '').toString(); } catch (e) {}
+    if (!text.trim()) { res.writeHead(400, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ error: 'no text' })); }
+    const body = JSON.stringify({ text: text.slice(0, 1500), voice_id: GRADIUM_VOICE, output_format: 'wav', only_audio: true, model_name: 'default' });
+    const u = new URL(GRADIUM_BASE + '/post/speech/tts');
+    const rq = https.request({ hostname: u.hostname, port: u.port || 443, path: u.pathname, method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': GRADIUM_KEY } }, (r) => {
+      res.writeHead(r.statusCode || 502, { 'content-type': r.headers['content-type'] || 'audio/wav' });
+      r.pipe(res);
+    });
+    rq.on('error', (e) => { res.writeHead(502, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: 'tts: ' + e.message })); });
+    rq.write(body); rq.end();
+  });
+}
+
+// speech (raw wav bytes) -> text  (parses Gradium's NDJSON, returns {text})
+function gradiumSTT(req, res) {
+  const chunks = [];
+  req.on('data', (c) => chunks.push(c));
+  req.on('end', () => {
+    const audio = Buffer.concat(chunks);
+    const u = new URL(GRADIUM_BASE + '/post/speech/asr?input_format=wav');
+    const rq = https.request({ hostname: u.hostname, port: u.port || 443, path: u.pathname + u.search, method: 'POST',
+      headers: { 'content-type': 'audio/wav', 'x-api-key': GRADIUM_KEY, 'content-length': audio.length } }, (r) => {
+      let d = '';
+      r.on('data', (c) => (d += c));
+      r.on('end', () => {
+        let txt = '';
+        d.split('\n').forEach((line) => { line = line.trim(); if (!line) return;
+          try { const o = JSON.parse(line); if (o.type === 'text') txt += (txt ? ' ' : '') + o.text; } catch (e) {} });
+        txt = txt.replace(/\s+([,.!?;:])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+        res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify({ text: txt }));
+      });
+    });
+    rq.on('error', (e) => { res.writeHead(502, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: 'stt: ' + e.message })); });
+    rq.write(audio); rq.end();
+  });
+}
 
 // ---------- Ollama backend: transparent streaming pipe ----------
 function handleOllama(req, res) {
@@ -186,4 +252,5 @@ server.listen(PORT, () => {
   console.log('Resilience Compass demo → http://localhost:' + PORT);
   if (BACKEND === 'openai') console.log('Model backend: OpenAI-compatible (NVIDIA NIM) → ' + OPENAI_BASE);
   else console.log('Model backend: Ollama → ' + OLLAMA_URL);
+  console.log('Voice (Gradium STT/TTS): ' + (GRADIUM_KEY ? 'enabled' : 'off (set GRADIUM_API_KEY)'));
 });
